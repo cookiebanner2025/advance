@@ -1,11 +1,10 @@
-this is one most advance code of the cookie banner 
 /**
- * Ultimate GDPR Cookie Consent Solution v4.0 - Advanced Edition
+ * Ultimate GDPR Cookie Consent Solution v4.1 - Advanced Edition
  * - Automatic translation based on user's country
  * - Domain restriction controls
  * - Geo-targeting (country/city/state level controls)
  * - Complete EU language support
- * - Built-in analytics dashboard
+ * - Built-in analytics dashboard with password protection
  * - Consent Mode v2 and future-proof compliance
  * - Premium UI with enhanced UX
  */
@@ -14,6 +13,14 @@ this is one most advance code of the cookie banner
 const config = {
     // Domain restriction - only show on these domains (empty array = all domains)
     allowedDomains: ['dev-rpractice.pantheonsite.io', 'yourdomain.com'],
+    
+    // Language configuration
+    languageConfig: {
+        defaultLanguage: 'en', // Default language if auto-detection fails
+        availableLanguages: [], // Empty array = all languages available
+        showLanguageSelector: true, // Show/hide language dropdown
+        autoDetectLanguage: true // Auto-detect language based on country/browser
+    },
     
     // Geo-targeting configuration
     geoConfig: {
@@ -40,7 +47,10 @@ const config = {
     analytics: {
         enabled: true,
         storageDays: 30, // How long to keep analytics data
-        showInDashboard: true // Show analytics in admin dashboard
+        showDashboard: true, // Show analytics dashboard button
+        passwordProtect: true, // Enable password protection
+        dashboardPassword: 'admin123', // Default password (should be changed per site)
+        passwordCookieDuration: 365 // Days to remember password
     },
     
     // Banner behavior
@@ -49,8 +59,13 @@ const config = {
         floatingButton: true, // Show floating settings button
         rememberLanguage: true, // Remember user's language preference
         acceptOnScroll: false, // Accept cookies when user scrolls
-        acceptOnContinue: true // Implicit consent when continuing to browse
-    }
+        acceptOnContinue: true, // Implicit consent when continuing to browse
+        floatingButtonPosition: 'left' // 'left' or 'right'
+    },
+
+
+    // UI Theme (can be 'default' or 'classic')
+    uiTheme: 'default'
 };
 
 // ============== MAIN IMPLEMENTATION ============== //
@@ -79,6 +94,18 @@ const colorScheme = {
     background: '#ffffff',   // White background
     toggleActive: '#2ecc71', // Same as primary
     toggleInactive: '#bdc3c7'// Gray for inactive
+};
+
+// Classic theme color scheme
+const classicColorScheme = {
+    primary: '#4CAF50',      // Green (accept button color)
+    secondary: '#2196F3',    // Blue (save button color)
+    danger: '#f44336',       // Red (reject button color)
+    textDark: '#212121',     // Dark text
+    textLight: '#757575',    // Light text
+    background: '#ffffff',   // White background
+    toggleActive: '#4CAF50', // Same as primary
+    toggleInactive: '#9E9E9E'// Gray for inactive
 };
 
 // Enhanced cookie database with detailed descriptions
@@ -114,7 +141,7 @@ const cookieDatabase = {
     'external_id': { category: 'functional', duration: 'Session', description: 'External service identifier' }
 };
 
-// Complete EU language translations
+// Complete EU language translations (same as before, but I'll include it for completeness)
 const translations = {
     en: {
         title: "We value your privacy",
@@ -142,7 +169,11 @@ const translations = {
         statsTotal: "Total",
         statsPercentage: "Percentage",
         statsLast7Days: "Last 7 Days",
-        statsLast30Days: "Last 30 Days"
+        statsLast30Days: "Last 30 Days",
+        passwordPrompt: "Enter password to view analytics",
+        passwordSubmit: "Submit",
+        passwordIncorrect: "Incorrect password",
+        dashboardTitle: "Consent Analytics Dashboard"
     },
     fr: {
         title: "Nous respectons votre vie privée",
@@ -170,9 +201,13 @@ const translations = {
         statsTotal: "Total",
         statsPercentage: "Pourcentage",
         statsLast7Days: "7 Derniers Jours",
-        statsLast30Days: "30 Derniers Jours"
+        statsLast30Days: "30 Derniers Jours",
+        passwordPrompt: "Entrez le mot de passe pour voir les analyses",
+        passwordSubmit: "Soumettre",
+        passwordIncorrect: "Mot de passe incorrect",
+        dashboardTitle: "Tableau de bord des analyses de consentement"
     },
-    de: {
+      de: {
         title: "Wir schätzen Ihre Privatsphäre",
         description: "Wir verwenden Cookies, um Ihr Surferlebnis zu verbessern, personalisierte Anzeigen oder Inhalte bereitzustellen und unseren Datenverkehr zu analysieren. Wenn Sie auf \"Alle akzeptieren\" klicken, erklären Sie sich mit der Verwendung von Cookies einverstanden.",
         privacy: "Datenschutzrichtlinie",
@@ -759,7 +794,9 @@ const translations = {
         statsPercentage: "Perċentwal",
         statsLast7Days: "Aħħar 7 Ġranet",
         statsLast30Days: "Aħħar 30 Ġranet"
-    }
+    },
+
+    // ... (keep all other language translations the same)
 };
 
 // Country to language mapping for auto-translation
@@ -838,6 +875,9 @@ let consentAnalytics = {
     monthly: {}
 };
 
+// Password protection for analytics
+let isDashboardAuthenticated = false;
+
 // Load analytics data from localStorage
 function loadAnalyticsData() {
     const savedData = localStorage.getItem('consentAnalytics');
@@ -853,6 +893,13 @@ function loadAnalyticsData() {
             rejected: 0,
             custom: 0
         };
+    }
+    
+    // Check if dashboard is authenticated
+    if (config.analytics.passwordProtect) {
+        isDashboardAuthenticated = getCookie('dashboard_auth') === 'true';
+    } else {
+        isDashboardAuthenticated = true;
     }
 }
 
@@ -961,7 +1008,7 @@ function generateAnalyticsDashboard(language = 'en') {
     
     return `
     <div class="analytics-dashboard">
-        <h3>${lang.statsTitle}</h3>
+        <h3>${lang.dashboardTitle}</h3>
         
         <div class="stats-summary">
             <div class="stat-card accepted">
@@ -1047,6 +1094,19 @@ function generateAnalyticsDashboard(language = 'en') {
     </div>`;
 }
 
+// Generate password prompt HTML
+function generatePasswordPrompt(language = 'en') {
+    const lang = translations[language] || translations.en;
+    
+    return `
+    <div class="password-prompt">
+        <h3>${lang.passwordPrompt}</h3>
+        <input type="password" id="dashboardPasswordInput" placeholder="Password">
+        <button id="dashboardPasswordSubmit">${lang.passwordSubmit}</button>
+        <p id="passwordError" class="error-message"></p>
+    </div>`;
+}
+
 // Check if current domain is allowed
 function isDomainAllowed() {
     if (config.allowedDomains.length === 0) return true;
@@ -1108,8 +1168,8 @@ function detectUserLanguage(geoData) {
         }
     }
     
-    // Then try to get language from country
-    if (geoData && geoData.country) {
+    // Then try to get language from country if auto-detection is enabled
+    if (config.languageConfig.autoDetectLanguage && geoData && geoData.country) {
         const countryLang = countryLanguageMap[geoData.country];
         if (countryLang && translations[countryLang]) {
             return countryLang;
@@ -1118,7 +1178,23 @@ function detectUserLanguage(geoData) {
     
     // Fallback to browser language
     const browserLang = (navigator.language || 'en').split('-')[0];
-    return translations[browserLang] ? browserLang : 'en';
+    if (translations[browserLang]) {
+        return browserLang;
+    }
+    
+    // Final fallback to configured default language
+    return config.languageConfig.defaultLanguage || 'en';
+}
+
+// Get available languages for dropdown
+function getAvailableLanguages() {
+    // If specific languages are configured, use those
+    if (config.languageConfig.availableLanguages.length > 0) {
+        return config.languageConfig.availableLanguages.filter(lang => translations[lang]);
+    }
+    
+    // Otherwise return all available languages
+    return Object.keys(translations);
 }
 
 // Change language dynamically
@@ -1155,7 +1231,7 @@ function changeLanguage(languageCode) {
             if (categoryElement) {
                 const container = categoryElement.closest('.cookie-category');
                 container.querySelector('h3').textContent = lang[key];
-                container.querySelector('p').textContent = lang[`${key}Desc`];
+                container.querySelector('p').textContent = lang[`${categoryKey}Desc`];
             }
         }
         
@@ -1175,6 +1251,13 @@ function changeLanguage(languageCode) {
     const dashboard = document.querySelector('.analytics-dashboard');
     if (dashboard) {
         dashboard.innerHTML = generateAnalyticsDashboard(languageCode);
+    }
+    
+    // Update password prompt if visible
+    const passwordPrompt = document.querySelector('.password-prompt');
+    if (passwordPrompt) {
+        passwordPrompt.innerHTML = generatePasswordPrompt(languageCode);
+        setupPasswordPromptEvents();
     }
     
     // Store selected language in cookie
@@ -1395,6 +1478,8 @@ function trackMarketingParameters() {
 
 function injectConsentHTML(detectedCookies, language = 'en') {
     const lang = translations[language] || translations.en;
+    const availableLanguages = getAvailableLanguages();
+    const currentTheme = config.uiTheme === 'classic' ? classicColorScheme : colorScheme;
     
     // Generate cookie tables for each category
     const generateCategorySection = (category) => {
@@ -1426,19 +1511,19 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         </div>`;
     };
     
-    // Generate language selector dropdown
-    const languageSelector = `
+    // Generate language selector dropdown if enabled
+    const languageSelector = config.languageConfig.showLanguageSelector ? `
     <div class="language-selector">
         <select id="cookieLanguageSelect">
-            ${Object.entries(translations).map(([code, translation]) => `
-                <option value="${code}" ${code === language ? 'selected' : ''}>${translation.language}</option>
+            ${availableLanguages.map(code => `
+                <option value="${code}" ${code === language ? 'selected' : ''}>${translations[code].language}</option>
             `).join('')}
         </select>
-    </div>`;
+    </div>` : '';
     
     // Generate admin dashboard button if analytics enabled
-    const adminButton = config.analytics.enabled && config.analytics.showInDashboard ? `
-    <div id="cookieAdminButton" class="cookie-admin-button" title="View Consent Analytics">
+    const adminButton = config.analytics.enabled && config.analytics.showDashboard ? `
+    <div id="cookieAdminButton" class="cookie-admin-button" title="${lang.dashboardTitle}">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
             <path d="M288 160C252.7 160 224 188.7 224 224C224 259.3 252.7 288 288 288C323.3 288 352 259.3 352 224C352 188.7 323.3 160 288 160zM95.4 112.6C142.5 68.84 207.2 32 288 32C368.8 32 433.5 68.84 480.6 112.6C527.4 156 558.7 207.1 573.5 243.7C576.8 251.6 576.8 260.4 573.5 268.3C558.7 304 527.4 355.1 480.6 399.4C433.5 443.2 368.8 480 288 480C207.2 480 142.5 443.2 95.4 399.4C48.6 355.1 17.3 304 2.5 268.3C-.8 260.4-.8 251.6 2.5 243.7C17.3 207.1 48.6 156 95.4 112.6V112.6zM288 80C218.6 80 160 138.6 160 208C160 277.4 218.6 336 288 336C357.4 336 416 277.4 416 208C416 138.6 357.4 80 288 80zM44.96 256C56.53 286.1 83.51 329.2 124.4 368C165.3 406.8 219.1 432 288 432C356.9 432 410.7 406.8 451.6 368C492.5 329.2 519.5 286.1 531 256C519.5 225.9 492.5 182.8 451.6 144C410.7 105.2 356.9 80 288 80C219.1 80 165.3 105.2 124.4 144C83.51 182.8 56.53 225.9 44.96 256V256z"/>
         </svg>
@@ -1497,11 +1582,13 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     <div id="cookieAnalyticsModal" class="cookie-analytics-modal">
         <div class="cookie-analytics-content">
             <div class="cookie-analytics-header">
-                <h2>${lang.statsTitle}</h2>
+                <h2>${lang.dashboardTitle}</h2>
                 <span class="close-analytics-modal">&times;</span>
             </div>
             <div class="cookie-analytics-body">
-                ${generateAnalyticsDashboard(language)}
+                ${config.analytics.passwordProtect && !isDashboardAuthenticated ? 
+                    generatePasswordPrompt(language) : 
+                    generateAnalyticsDashboard(language)}
             </div>
         </div>
     </div>
@@ -1511,9 +1598,9 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     .cookie-consent-banner {
         position: fixed;
         bottom: 20px;
-        left: 20px;
+        ${config.behavior.floatingButtonPosition === 'left' ? 'left: 20px;' : 'right: 20px;'}
         width: 440px;
-        background: #ffffff;
+        background: ${currentTheme.background};
         border-radius: 12px;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
         z-index: 9999;
@@ -1536,7 +1623,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     .cookie-consent-content h2 {
         margin: 0 0 16px 0;
         font-size: 18px;
-        color: #1a1a1a;
+        color: ${currentTheme.textDark};
         font-weight: 600;
         line-height: 1.4;
         letter-spacing: -0.2px;
@@ -1545,12 +1632,12 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     .cookie-consent-content p {
         margin: 0 0 24px 0;
         font-size: 14px;
-        color: #666;
+        color: ${currentTheme.textLight};
         line-height: 1.5;
     }
 
     .privacy-policy-link {
-        color: #3498db;
+        color: ${currentTheme.secondary};
         text-decoration: none;
         font-size: 13px;
         font-weight: 500;
@@ -1596,8 +1683,8 @@ function injectConsentHTML(detectedCookies, language = 'en') {
 
     .reject-btn {
         background-color: #fff;
-        color: #e74c3c;
-        border: 1px solid #e74c3c;
+        color: ${currentTheme.danger};
+        border: 1px solid ${currentTheme.danger};
     }
 
     .reject-btn:hover {
@@ -1607,9 +1694,9 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .accept-btn {
-        background-color: #2ecc71;
+        background-color: ${currentTheme.primary};
         color: white;
-        border: 1px solid #2ecc71;
+        border: 1px solid ${currentTheme.primary};
         box-shadow: 0 2px 12px rgba(46, 204, 113, 0.3);
     }
 
@@ -1638,13 +1725,13 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .language-selector select:hover {
-        border-color: #3498db;
+        border-color: ${currentTheme.secondary};
         background-color: #fff;
     }
 
     .language-selector select:focus {
         outline: none;
-        border-color: #3498db;
+        border-color: ${currentTheme.secondary};
         box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
     }
 
@@ -1672,7 +1759,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .cookie-settings-content {
-        background-color: ${colorScheme.background};
+        background-color: ${currentTheme.background};
         margin: 0 auto;
         width: 845px;
         max-height: 470px;
@@ -1700,7 +1787,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
 
     .cookie-settings-header h2 {
         margin: 0;
-        color: ${colorScheme.textDark};
+        color: ${currentTheme.textDark};
         font-size: 1.5rem;
         font-weight: 600;
     }
@@ -1709,7 +1796,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         font-size: 28px;
         font-weight: bold;
         cursor: pointer;
-        color: ${colorScheme.textLight};
+        color: ${currentTheme.textLight};
         background: none;
         border: none;
         padding: 0 10px;
@@ -1717,7 +1804,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .close-modal:hover {
-        color: ${colorScheme.danger};
+        color: ${currentTheme.danger};
     }
 
     .cookie-settings-body {
@@ -1758,7 +1845,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     .toggle-container h3 {
         margin: 0;
         font-size: 1.1rem;
-        color: ${colorScheme.textDark};
+        color: ${currentTheme.textDark};
         font-weight: 600;
     }
 
@@ -1782,7 +1869,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         left: 0;
         right: 0;
         bottom: 0;
-        background-color: ${colorScheme.toggleInactive};
+        background-color: ${currentTheme.toggleInactive};
         transition: .4s;
         border-radius: 34px;
     }
@@ -1801,7 +1888,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     input:checked + .toggle-slider {
-        background-color: ${colorScheme.toggleActive};
+        background-color: ${currentTheme.toggleActive};
     }
 
     input:checked + .toggle-slider:before {
@@ -1824,7 +1911,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
 
     .cookie-details-container:hover {
         box-shadow: 0 3px 12px rgba(0,0,0,0.1);
-        border-color: ${colorScheme.primary};
+        border-color: ${currentTheme.primary};
     }
 
     .cookie-details-header {
@@ -1867,13 +1954,13 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         background-color: #f0f0f0;
         font-weight: 600;
         border-bottom: 2px solid #e0e0e0;
-        color: ${colorScheme.textDark};
+        color: ${currentTheme.textDark};
     }
 
     .cookie-details-table td {
         padding: 10px 12px;
         border-bottom: 1px solid #e0e0e0;
-        color: ${colorScheme.textLight};
+        color: ${currentTheme.textLight};
     }
 
     .cookie-details-table tr:last-child td {
@@ -1889,7 +1976,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         padding: 2px 5px;
         border-radius: 3px;
         font-family: monospace;
-        color: ${colorScheme.textDark};
+        color: ${currentTheme.textDark};
     }
 
     .no-cookies-message {
@@ -1903,10 +1990,10 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     .cookie-settings-button {
         position: fixed;
         bottom: 30px;
-        left: 30px;
+        ${config.behavior.floatingButtonPosition === 'left' ? 'left: 30px;' : 'right: 30px;'}
         width: 60px;
         height: 60px;
-        background-color: ${colorScheme.primary};
+        background-color: ${currentTheme.primary};
         border-radius: 50%;
         display: none;
         align-items: center;
@@ -1945,11 +2032,12 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     /* Admin Button */
     .cookie-admin-button {
         position: fixed;
-        bottom: 100px;
-        left: 30px;
+        ${config.behavior.floatingButtonPosition === 'left' ? 
+          'left: 30px; bottom: 100px;' : 
+          'right: 30px; bottom: 100px;'}
         width: 60px;
         height: 60px;
-        background-color: ${colorScheme.secondary};
+        background-color: ${currentTheme.secondary};
         border-radius: 50%;
         display: none;
         align-items: center;
@@ -2009,7 +2097,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .cookie-analytics-content {
-        background-color: ${colorScheme.background};
+        background-color: ${currentTheme.background};
         margin: 0 auto;
         width: 900px;
         max-height: 600px;
@@ -2037,7 +2125,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
 
     .cookie-analytics-header h2 {
         margin: 0;
-        color: ${colorScheme.textDark};
+        color: ${currentTheme.textDark};
         font-size: 1.5rem;
         font-weight: 600;
     }
@@ -2046,7 +2134,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         font-size: 28px;
         font-weight: bold;
         cursor: pointer;
-        color: ${colorScheme.textLight};
+        color: ${currentTheme.textLight};
         background: none;
         border: none;
         padding: 0 10px;
@@ -2054,7 +2142,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .close-analytics-modal:hover {
-        color: ${colorScheme.danger};
+        color: ${currentTheme.danger};
     }
 
     .cookie-analytics-body {
@@ -2064,12 +2152,55 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         flex: 1;
     }
 
+    /* Password Prompt */
+    .password-prompt {
+        text-align: center;
+        padding: 30px;
+    }
+
+    .password-prompt h3 {
+        color: ${currentTheme.textDark};
+        margin-bottom: 20px;
+    }
+
+    .password-prompt input {
+        padding: 12px 15px;
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+        width: 100%;
+        max-width: 300px;
+        margin-bottom: 15px;
+        font-size: 14px;
+    }
+
+    .password-prompt button {
+        padding: 12px 25px;
+        background-color: ${currentTheme.primary};
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .password-prompt button:hover {
+        background-color: #27ae60;
+    }
+
+    .error-message {
+        color: ${currentTheme.danger};
+        margin-top: 10px;
+        font-size: 14px;
+    }
+
+    /* Stats Dashboard */
     .analytics-dashboard {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
     .analytics-dashboard h3 {
-        color: ${colorScheme.textDark};
+        color: ${currentTheme.textDark};
         margin-top: 0;
         margin-bottom: 20px;
         font-size: 1.3rem;
@@ -2096,15 +2227,15 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .stat-card.accepted {
-        border-top: 4px solid #2ecc71;
+        border-top: 4px solid ${currentTheme.primary};
     }
 
     .stat-card.rejected {
-        border-top: 4px solid #e74c3c;
+        border-top: 4px solid ${currentTheme.danger};
     }
 
     .stat-card.custom {
-        border-top: 4px solid #3498db;
+        border-top: 4px solid ${currentTheme.secondary};
     }
 
     .stat-card.total {
@@ -2114,19 +2245,19 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     .stat-card h4 {
         margin: 0 0 10px 0;
         font-size: 1rem;
-        color: ${colorScheme.textLight};
+        color: ${currentTheme.textLight};
     }
 
     .stat-value {
         font-size: 1.8rem;
         font-weight: 700;
-        color: ${colorScheme.textDark};
+        color: ${currentTheme.textDark};
         margin-bottom: 5px;
     }
 
     .stat-percentage {
         font-size: 1rem;
-        color: ${colorScheme.textLight};
+        color: ${currentTheme.textLight};
     }
 
     .time-based-stats {
@@ -2144,7 +2275,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     .time-stat h4 {
         margin: 0 0 15px 0;
         font-size: 1.1rem;
-        color: ${colorScheme.textDark};
+        color: ${currentTheme.textDark};
     }
 
     .stat-bars {
@@ -2159,7 +2290,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
 
     .stat-bar-label {
         font-size: 0.85rem;
-        color: ${colorScheme.textLight};
+        color: ${currentTheme.textLight};
         margin-bottom: 5px;
     }
 
@@ -2176,22 +2307,22 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .stat-bar-segment.accepted {
-        background-color: #2ecc71;
+        background-color: ${currentTheme.primary};
     }
 
     .stat-bar-segment.rejected {
-        background-color: #e74c3c;
+        background-color: ${currentTheme.danger};
     }
 
     .stat-bar-segment.custom {
-        background-color: #3498db;
+        background-color: ${currentTheme.secondary};
     }
 
     .stat-bar-legend {
         display: flex;
         justify-content: space-between;
         font-size: 0.75rem;
-        color: ${colorScheme.textLight};
+        color: ${currentTheme.textLight};
         margin-top: 5px;
     }
 
@@ -2206,9 +2337,9 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .save-btn {
-        background-color: ${colorScheme.secondary};
+        background-color: ${currentTheme.secondary};
         color: white;
-        background-image: linear-gradient(to right, ${colorScheme.secondary}, #2980b9);
+        background-image: linear-gradient(to right, ${currentTheme.secondary}, #2980b9);
     }
 
     .save-btn:hover {
@@ -2237,7 +2368,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     @media (max-width: 768px) {
         .cookie-consent-banner {
             width: 90%;
-            left: 5%;
+            ${config.behavior.floatingButtonPosition === 'left' ? 'left: 5%;' : 'right: 5%;'}
             bottom: 10px;
             padding: 20px;
         }
@@ -2286,7 +2417,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         .cookie-consent-banner {
             padding: 15px;
             width: calc(100% - 30px);
-            left: 15px;
+            ${config.behavior.floatingButtonPosition === 'left' ? 'left: 15px;' : 'right: 15px;'}
         }
         
         .cookie-consent-content h2 {
@@ -2311,14 +2442,15 @@ function injectConsentHTML(detectedCookies, language = 'en') {
             width: 50px;
             height: 50px;
             bottom: 15px;
-            left: 15px;
+            ${config.behavior.floatingButtonPosition === 'left' ? 'left: 15px;' : 'right: 15px;'}
         }
         
         .cookie-admin-button {
             width: 50px;
             height: 50px;
-            bottom: 80px;
-            left: 15px;
+            ${config.behavior.floatingButtonPosition === 'left' ? 
+              'left: 15px; bottom: 80px;' : 
+              'right: 15px; bottom: 80px;'}
         }
         
         .cookie-settings-button svg {
@@ -2392,7 +2524,7 @@ function initializeCookieConsent(detectedCookies, language) {
     }
     
     // Setup admin button if enabled
-    if (config.analytics.enabled && config.analytics.showInDashboard) {
+    if (config.analytics.enabled && config.analytics.showDashboard) {
         const adminButton = document.getElementById('cookieAdminButton');
         if (adminButton) {
             adminButton.addEventListener('click', showAnalyticsDashboard);
@@ -2401,6 +2533,33 @@ function initializeCookieConsent(detectedCookies, language) {
                 adminButton.classList.add('show');
             }, 100);
         }
+    }
+    
+    // Setup password prompt events if needed
+    if (config.analytics.passwordProtect && !isDashboardAuthenticated) {
+        setupPasswordPromptEvents();
+    }
+}
+
+function setupPasswordPromptEvents() {
+    const passwordSubmit = document.getElementById('dashboardPasswordSubmit');
+    if (passwordSubmit) {
+        passwordSubmit.addEventListener('click', function() {
+            const passwordInput = document.getElementById('dashboardPasswordInput');
+            const errorMessage = document.getElementById('passwordError');
+            
+            if (passwordInput.value === config.analytics.dashboardPassword) {
+                isDashboardAuthenticated = true;
+                setCookie('dashboard_auth', 'true', config.analytics.passwordCookieDuration);
+                
+                // Update the dashboard content
+                const lang = document.getElementById('cookieLanguageSelect') ? 
+                    document.getElementById('cookieLanguageSelect').value : 'en';
+                document.querySelector('.cookie-analytics-body').innerHTML = generateAnalyticsDashboard(lang);
+            } else {
+                errorMessage.textContent = translations[lang].passwordIncorrect;
+            }
+        });
     }
 }
 
@@ -2551,11 +2710,24 @@ function hideCookieSettings() {
 }
 
 function showAnalyticsDashboard() {
-    const modal = document.getElementById('cookieAnalyticsModal');
-    modal.style.display = 'flex';
-    setTimeout(() => {
-        modal.classList.add('show');
-    }, 10);
+    if (config.analytics.passwordProtect && !isDashboardAuthenticated) {
+        // Show password prompt if not authenticated
+        const modal = document.getElementById('cookieAnalyticsModal');
+        modal.style.display = 'flex';
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+    } else {
+        // Show dashboard if authenticated or no password protection
+        const modal = document.getElementById('cookieAnalyticsModal');
+        const lang = document.getElementById('cookieLanguageSelect') ? 
+            document.getElementById('cookieLanguageSelect').value : 'en';
+        document.querySelector('.cookie-analytics-body').innerHTML = generateAnalyticsDashboard(lang);
+        modal.style.display = 'flex';
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+    }
 }
 
 function hideAnalyticsDashboard() {
@@ -2786,5 +2958,4 @@ function getCookie(name) {
     }
     return null;
 }
-
 
