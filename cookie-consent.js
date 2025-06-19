@@ -1,79 +1,380 @@
-/**
- * Ultimate GDPR Cookie Consent Solution v4.1 - Advanced Edition
- * - Automatic translation based on user's country
- * - Domain restriction controls
- * - Geo-targeting (country/city/state level controls)
- * - Complete EU language support
- * - Built-in analytics dashboard with password protection
- * - Consent Mode v2 and future-proof compliance
- * - Premium UI with enhanced UX
- */
+const EU_COUNTRIES = [
+  "AL", // Albania
+  "AD", // Andorra
+  "AM", // Armenia
+  "AT", // Austria
+  "AZ", // Azerbaijan
+  "BY", // Belarus
+  "BE", // Belgium
+  "BA", // Bosnia & Herzegovina
+  "BG", // Bulgaria
+  "HR", // Croatia
+  "CY", // Cyprus
+  "CZ", // Czech Republic
+  "DK", // Denmark
+  "EE", // Estonia
+  "FI", // Finland
+  "FR", // France
+  "GE", // Georgia
+  "DE", // Germany
+  "GR", // Greece
+  "HU", // Hungary
+  "IS", // Iceland
+  "IE", // Ireland
+  "IT", // Italy
+  "KZ", // Kazakhstan
+  "XK", // Kosovo
+  "LV", // Latvia
+  "LI", // Liechtenstein
+  "LT", // Lithuania
+  "LU", // Luxembourg
+  "MT", // Malta
+  "MD", // Moldova
+  "MC", // Monaco
+  "ME", // Montenegro
+  "NL", // Netherlands
+  "MK", // North Macedonia
+  "NO", // Norway
+  "PL", // Poland
+  "PT", // Portugal
+  "RO", // Romania
+  "RU", // Russia
+  "SM", // San Marino
+  "RS", // Serbia
+  "SK", // Slovakia
+  "SI", // Slovenia
+  "ES", // Spain
+  "SE", // Sweden
+  "CH", // Switzerland
+  "TR", // Turkey
+  "UA", // Ukraine
+  "GB", // United Kingdom
+  "VA", // Vatican City
+];
 
-// ============== CONFIGURATION SECTION ============== //
 const config = {
-    // Domain restriction - only show on these domains (empty array = all domains)
-    allowedDomains: ['dev-rpractice.pantheonsite.io', 'yourdomain.com'],
+    // Domain restriction
+    allowedDomains: [],
+    
+    // Privacy policy URL (configurable)
+    privacyPolicyUrl: 'https://yourdomain.com/privacy-policy', // Add your full privacy policy URL here
+    
+    // Microsoft UET Configuration
+    // Microsoft UET Configuration
+    uetConfig: {
+        enabled: true,
+        defaultTagId: '137027166', // Fallback if auto-detection fails
+        autoDetectTagId: true,     // Try to detect UET tag ID automatically
+        defaultConsent: 'denied',  // 'denied' or 'granted'
+        enforceInEEA: true,        // Enforce consent mode in EEA countries
+        msd: window.location.hostname // Add this line for Microsoft Domain handling
+    },
+    
+    // Behavior configuration
+    behavior: {
+        autoShow: true,
+        bannerDelay: 0,
+        rememberLanguage: true,
+        acceptOnScroll: false,
+        acceptOnContinue: false,
+        showFloatingButton: true,
+        showAdminButton: false,
+        floatingButtonPosition: 'left',
+        adminButtonPosition: 'left',
+        bannerPosition: 'left',
+        bannerAnimation: {
+            duration: 0.4,
+            easing: 'cubic-bezier(0.25, 0.8, 0.25, 1)',
+            enterEffect: 'fadeInUp',
+            exitEffect: 'fadeOutDown'
+        },
+        modalAnimation: {
+            duration: 0.3,
+            easing: 'ease-in-out',
+            enterEffect: 'fadeIn',
+            exitEffect: 'fadeOut'
+        },
+        dashboardAnimation: {
+            duration: 0.3,
+            easing: 'ease-in-out',
+            enterEffect: 'fadeIn',
+            exitEffect: 'fadeOut'
+        },
+        
+        // New timeline configuration for banner visibility
+        bannerSchedule: {
+            enabled: false, // Set to true to enable scheduling
+            startDate: '2023-01-01', // Start date (YYYY-MM-DD)
+            endDate: '2023-12-31',   // End date (YYYY-MM-DD)
+            startTime: '00:00',      // Start time (24-hour format)
+            endTime: '23:59',        // End time (24-hour format)
+            daysOfWeek: [1,2,3,4,5], // 0=Sunday, 1=Monday, etc.
+            durationDays: 365,       // Alternative: show banner for X days from first visit
+            durationMinutes: 2       // Alternative: show banner for X minutes per session
+        }
+    },
     
     // Language configuration
     languageConfig: {
-        defaultLanguage: 'en', // Default language if auto-detection fails
-        availableLanguages: [], // Empty array = all languages available
-        showLanguageSelector: true, // Show/hide language dropdown
-        autoDetectLanguage: true // Auto-detect language based on country/browser
+        defaultLanguage: 'en',
+        availableLanguages: [], // Only en and fr as requested
+        showLanguageSelector: true,
+        autoDetectLanguage: true
     },
     
     // Geo-targeting configuration
-    geoConfig: {
-        // Only show in these countries (empty array = all countries)
-        allowedCountries: [],
-        
-        // Only show in these regions/states (empty array = all regions)
-        allowedRegions: [],
-        
-        // Only show in these cities (empty array = all cities)
-        allowedCities: [],
-        
-        // Countries where banner should be hidden
-        blockedCountries: [],
-        
-        // Regions where banner should be hidden
-        blockedRegions: [],
-        
-        // Cities where banner should be hidden
-        blockedCities: []
-    },
+ // In your config object, update the geoConfig section:
+geoConfig: {
+    allowedCountries: [], // Only show in these countries (empty = all allowed)
+    allowedRegions: [], // Only show in these regions
+    allowedCities: [], // Only show in these cities
+    blockedCountries: [], // Never show in these countries
+    blockedRegions: [], // Never show in these regions
+    blockedCities: [], // Never show in these cities
+    euOnly: true, // NEW: Set to true to only show in EU countries
+    specificRegions: [] // NEW: Can specify 'EU' or other regions
+},
     
     // Analytics configuration
     analytics: {
         enabled: true,
-        storageDays: 30, // How long to keep analytics data
-        showDashboard: true, // Show analytics dashboard button
-        passwordProtect: true, // Enable password protection
-        dashboardPassword: 'admin123', // Default password (should be changed per site)
-        passwordCookieDuration: 365 // Days to remember password
+        storageDays: 365,
+        showDashboard: true,
+        passwordProtect: true,
+        dashboardPassword: 'admin123',
+        passwordCookieDuration: 365,
+        trackPageViews: true,
+        trackEvents: true,
+        trackConsentChanges: true
     },
     
-    // Banner behavior
-    behavior: {
-        autoShow: true, // Automatically show banner on page load
-        floatingButton: true, // Show floating settings button
-        rememberLanguage: true, // Remember user's language preference
-        acceptOnScroll: false, // Accept cookies when user scrolls
-        acceptOnContinue: true, // Implicit consent when continuing to browse
-        floatingButtonPosition: 'left' // 'left' or 'right'
+    // UI Theme selection
+    uiTheme: 'default',
+    
+    // Banner styling
+    bannerStyle: {
+        background: '#ffffff',
+        borderRadius: '12px',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+        width: '465px',
+        padding: '24px',
+        textColor: '#2c3e50',
+        linkColor: '#3498db',
+        linkHoverColor: '#1d6fa5',
+        border: {
+            enabled: false,
+            width: '1px',
+            style: 'solid',
+            color: '#e0e0e0'
+        },
+        title: {
+            fontSize: '18px',
+            fontWeight: '600',
+            color: '#2c3e50'
+        },
+        description: {
+            fontSize: '14px',
+            lineHeight: '1.5',
+            color: '#7f8c8d'
+        }
     },
-
-
-    // UI Theme (can be 'default' or 'classic')
-    uiTheme: 'default'
+    
+    // Button styling
+    buttonStyle: {
+        borderRadius: '8px',
+        padding: '12px 20px',
+        fontWeight: '600',
+        fontSize: '14px',
+        transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
+        
+       accept: {
+    background: '#2ecc71 !important',
+    color: '#ffffff !important',
+    border: '1px solid #2ecc71 !important',
+    hover: {
+        background: '#27ae60 !important',
+        color: '#ffffff !important',
+        transform: 'translateY(-1px) !important'
+    }
+        },
+        
+        reject: {
+            background: '#ffffff',
+            color: '#e74c3c',
+            border: '1px solid #e74c3c',
+            hover: {
+                background: '#ffeeed',
+                color: '#e74c3c',
+                transform: 'translateY(-1px)'
+            }
+        },
+        
+        adjust: {
+            background: '#f8f9fa',
+            color: '#333333',
+            border: '1px solid #e0e0e0',
+            hover: {
+                background: '#f0f2f5',
+                color: '#333333',
+                transform: 'translateY(-1px)'
+            }
+        },
+        
+        save: {
+            background: '#3498db',
+            color: '#ffffff',
+            border: '1px solid #3498db',
+            hover: {
+                background: '#2980b9',
+                color: '#ffffff',
+                transform: 'translateY(-1px)'
+            }
+        }
+    },
+    
+    // Floating button styling
+    floatingButtonStyle: {
+        size: '50px',
+        background: '#2ecc71',
+        iconColor: '#ffffff',
+        border: '2px solid #ffffff',
+        borderRadius: '50%',
+        boxShadow: '0 6px 20px rgba(0, 0, 0, 0.2)',
+        hover: {
+            background: '#27ae60',
+            transform: 'translateY(-3px) scale(1.05)',
+            boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)'
+        }
+    },
+    
+    // Admin button styling
+    adminButtonStyle: {
+        size: '60px',
+        background: '#2ecc71',
+        iconColor: '#ffffff',
+        border: '2px solid #ffffff',
+        borderRadius: '50%',
+        boxShadow: '0 6px 20px rgba(0, 0, 0, 0.2)',
+        hover: {
+            background: '#2980b9',
+            transform: 'translateY(-3px) scale(1.05)',
+            boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)'
+        }
+    },
+    
+    // Modal styling
+    modalStyle: {
+        background: '#ffffff',
+        borderRadius: '12px',
+        width: '845px',
+        maxHeight: '470px',
+        header: {
+            background: '#f8f9fa',
+            textColor: '#2c3e50',
+            fontSize: '1.5rem',
+            fontWeight: '600'
+        },
+        body: {
+            background: '#fefefe',
+            textColor: '#2c3e50'
+        },
+        footer: {
+            background: '#f8f9fa',
+            borderTop: '1px solid #ecf0f1'
+        },
+        closeButton: {
+            color: '#7f8c8d',
+            hoverColor: '#e74c3c'
+        }
+    },
+    
+    // Toggle switch styling
+    toggleStyle: {
+        activeColor: '#2ecc71',
+        inactiveColor: '#bdc3c7',
+        size: '50px',
+        height: '26px',
+        sliderSize: '20px'
+    },
+    
+    // Cookie category styling
+    categoryStyle: {
+        background: '#f8f9fa',
+        borderRadius: '8px',
+        border: '1px solid #ecf0f1',
+        title: {
+            fontSize: '1.1rem',
+            fontWeight: '600',
+            color: '#2c3e50'
+        },
+        description: {
+            fontSize: '14px',
+            color: '#7f8c8d'
+        }
+    },
+    
+    // Dashboard styling
+    dashboardStyle: {
+        background: '#ffffff',
+        borderRadius: '12px',
+        width: '900px',
+        maxHeight: '600px',
+        header: {
+            background: '#f8f9fa',
+            textColor: '#2c3e50',
+            fontSize: '1.5rem',
+            fontWeight: '600'
+        },
+        body: {
+            background: '#fefefe'
+        },
+        statCards: {
+            background: '#f8f9fa',
+            borderRadius: '8px',
+            acceptedColor: '#2ecc71',
+            rejectedColor: '#e74c3c',
+            customColor: '#3498db',
+            totalColor: '#9b59b6'
+        },
+        barChart: {
+            height: '20px',
+            borderRadius: '10px',
+            background: '#ecf0f1',
+            acceptedColor: '#2ecc71',
+            rejectedColor: '#e74c3c',
+            customColor: '#3498db'
+        }
+    }
 };
 
-// ============== MAIN IMPLEMENTATION ============== //
+// ============== IMPLEMENTATION SECTION ============== //
+// ============== IMPLEMENTATION SECTION ============== //
 // Initialize dataLayer for Google Tag Manager
 window.dataLayer = window.dataLayer || [];
+
+// Initialize UET queue with msd parameter if not already exists
+if (typeof window.uetq === 'undefined') {
+    window.uetq = [];
+    // Set msd parameter immediately if UET is enabled
+    if (config.uetConfig.enabled && config.uetConfig.msd) {
+        window.uetq.push('set', 'msd', config.uetConfig.msd);
+        
+        // Push initialization event to dataLayer
+        window.dataLayer.push({
+            'event': 'uet_initialized',
+            'uet_params': {
+                'msd': config.uetConfig.msd,
+                'tag_id': config.uetConfig.defaultTagId,
+                'auto_detect': config.uetConfig.autoDetectTagId
+            },
+            'timestamp': new Date().toISOString()
+        });
+    }
+}
+
 function gtag() { dataLayer.push(arguments); }
 
-// Set default consent (deny all except security)
+// Set default consent (deny all except security) AND initial GCS signal
 gtag('consent', 'default', {
     'ad_storage': 'denied',
     'analytics_storage': 'denied',
@@ -84,64 +385,165 @@ gtag('consent', 'default', {
     'security_storage': 'granted'
 });
 
-// Color scheme - easily customizable
-const colorScheme = {
-    primary: '#2ecc71',      // Green (accept button color)
-    secondary: '#3498db',    // Blue (save button color)
-    danger: '#e74c3c',       // Red (reject button color)
-    textDark: '#2c3e50',     // Dark text
-    textLight: '#7f8c8d',    // Light text
-    background: '#ffffff',   // White background
-    toggleActive: '#2ecc71', // Same as primary
-    toggleInactive: '#bdc3c7'// Gray for inactive
-};
+// Push initial GCS signal (G100) immediately after default consent
+window.dataLayer.push({
+    'event': 'initial_consent_state',
+    'consent_mode': {
+        'ad_storage': 'denied',
+        'analytics_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'personalization_storage': 'denied',
+        'functionality_storage': 'denied',
+        'security_storage': 'granted'
+    },
+    'gcs': 'G100', // Explicit initial GCS signal
+    'timestamp': new Date().toISOString()
+});
 
-// Classic theme color scheme
-const classicColorScheme = {
-    primary: '#4CAF50',      // Green (accept button color)
-    secondary: '#2196F3',    // Blue (save button color)
-    danger: '#f44336',       // Red (reject button color)
-    textDark: '#212121',     // Dark text
-    textLight: '#757575',    // Light text
-    background: '#ffffff',   // White background
-    toggleActive: '#4CAF50', // Same as primary
-    toggleInactive: '#9E9E9E'// Gray for inactive
-};
+// Set default UET consent
+function setDefaultUetConsent() {
+    if (!config.uetConfig.enabled) return;
+    
+    // Initialize UET queue if not exists with msd parameter
+    if (typeof window.uetq === 'undefined') {
+        window.uetq = [];
+        if (config.uetConfig.msd) {
+            window.uetq.push('set', 'msd', config.uetConfig.msd);
+        }
+    }
+    
+    const consentState = config.uetConfig.defaultConsent === 'granted' ? 'granted' : 'denied';
+    
+    // Push consent update with additional parameters
+    window.uetq.push('consent', 'default', {
+        'ad_storage': consentState,
+        'data_processing': config.uetConfig.enforceInEEA && EU_COUNTRIES.includes(locationData?.country || '') ? 
+            ['LDU'] : ['GDPR']
+    });
+    
+    // Enhanced dataLayer push for UET consent
+    window.dataLayer.push({
+        'event': 'uet_consent_default',
+        'consent_mode': {
+            'ad_storage': consentState,
+            'analytics_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied'
+        },
+        'uet_config': {
+            'msd': config.uetConfig.msd || window.location.hostname,
+            'enforce_eea': config.uetConfig.enforceInEEA,
+            'data_processing': config.uetConfig.enforceInEEA && EU_COUNTRIES.includes(locationData?.country || '') ? 
+                'LDU' : 'GDPR'
+        },
+        'gcs': 'G100',
+        'timestamp': new Date().toISOString(),
+        'location_data': locationData
+    });
+}
+
 
 // Enhanced cookie database with detailed descriptions
 const cookieDatabase = {
-    // Google Analytics/GA4
-    '_ga': { category: 'analytics', duration: '2 years', description: 'Google Analytics user distinction' },
-    '_gid': { category: 'analytics', duration: '24 hours', description: 'Google Analytics user distinction' },
-    '_gat': { category: 'analytics', duration: '1 minute', description: 'Google Analytics throttle rate' },
-    '_ga_': { category: 'analytics', duration: '2 years', description: 'GA4 session state' },
-    
-    // Facebook Pixel
-    '_fbp': { category: 'advertising', duration: '3 months', description: 'Facebook conversion tracking' },
-    'fr': { category: 'advertising', duration: '3 months', description: 'Facebook targeted ads' },
-    
-    // Functional cookies
-    'wordpress_': { category: 'functional', duration: 'Session', description: 'WordPress authentication' },
-    'wp-settings': { category: 'functional', duration: '1 year', description: 'WordPress preferences' },
+    // Existing cookies
+    '_gcl': { category: 'advertising', duration: '90 days', description: 'Google Click Identifier - Tracks ad clicks and conversions' },
+    '_gcl_au': { category: 'advertising', duration: '90 days', description: 'Google Ads conversion tracking' },
+    'gclid': { category: 'advertising', duration: '30 days', description: 'Google Click ID - Tracks PPC ad clicks' },
+    'IDE': { category: 'advertising', duration: '390 days', description: 'Google DoubleClick - Used for retargeting' },
+    'NID': { category: 'advertising', duration: '180 days', description: 'Google Ads preferences' },
+    '_gat_gtag': { category: 'advertising', duration: '1 minute', description: 'Google Tag Manager throttle' },
+    'msclkid': { category: 'advertising', duration: '30 days', description: 'Microsoft Click ID - Tracks ad clicks' },
+    '_uetmsdns': { category: 'advertising', duration: 'Session', description: 'Microsoft UET consent mode cookie' },
+    'MUID': { category: 'advertising', duration: '390 days', description: 'Microsoft Universal ID' },
+    '_uetsid': { category: 'advertising', duration: '1 day', description: 'Bing Ads session ID' },
+  '_uetmsclkid': { 
+        category: 'advertising', 
+        duration: 'Session', 
+        description: 'Microsoft UET click ID - Tracks ad clicks for conversion' 
+    },
+  '_uetmsd': { 
+        category: 'advertising', 
+        duration: 'Session', 
+        description: 'Microsoft UET domain setting - Enables cross-domain tracking' 
+    },
+    'MUIDB': { 
+        category: 'advertising', 
+        duration: '390 days', 
+        description: 'Microsoft Universal ID backup - Fallback identifier' 
+    },
+    '_uetvid': { category: 'advertising', duration: '390 days', description: 'Bing Ads visitor ID' },
+    '_fbp': { category: 'advertising', duration: '90 days', description: 'Facebook Pixel - Conversion tracking' },
+    'fr': { category: 'advertising', duration: '90 days', description: 'Facebook browser ID' },
+    'datr': { category: 'advertising', duration: '730 days', description: 'Facebook browser identification' },
+    '_ttp': { category: 'advertising', duration: '390 days', description: 'TikTok Pixel tracking' },
+    'ttclid': { category: 'advertising', duration: '30 days', description: 'TikTok Click ID' },
+    'tt_sessionid': { category: 'advertising', duration: '1 day', description: 'TikTok session' },
+    'lidc': { category: 'advertising', duration: '1 day', description: 'LinkedIn Ads routing' },
+    'bcookie': { category: 'advertising', duration: '730 days', description: 'LinkedIn Browser ID' },
+    'li_sugr': { category: 'advertising', duration: '90 days', description: 'LinkedIn user tracking' },
+    '_pinterest_ct_ua': { category: 'advertising', duration: '365 days', description: 'Pinterest Click Tracking' },
+    '_pinterest_sess': { category: 'advertising', duration: '1 day', description: 'Pinterest session' },
+    'cm_sub': { category: 'advertising', duration: '365 days', description: 'Pinterest conversion' },
+    'obuid': { category: 'advertising', duration: '365 days', description: 'Outbrain user ID' },
+    'obcl': { category: 'advertising', duration: '30 days', description: 'Outbrain click tracking' },
+    'personalization_id': { category: 'advertising', duration: '730 days', description: 'Twitter personalization' },
+    'guest_id': { category: 'advertising', duration: '730 days', description: 'Twitter guest tracking' },
+    'sc_at': { category: 'advertising', duration: '365 days', description: 'Snapchat Ads tracking' },
+    '_scid': { category: 'advertising', duration: '365 days', description: 'Snapchat user ID' },
+    'rdt_uuid': { category: 'advertising', duration: '365 days', description: 'Reddit unique user ID' },
+    'session_tracker': { category: 'advertising', duration: '1 day', description: 'Reddit session' },
+    'criteo': { category: 'advertising', duration: '365 days', description: 'Criteo retargeting' },
+    'uid': { category: 'advertising', duration: '365 days', description: 'Criteo user ID' },
+    '__adroll': { category: 'advertising', duration: '365 days', description: 'AdRoll tracking' },
+    '__ar_v4': { category: 'advertising', duration: '365 days', description: 'AdRoll segmentation' },
+    'ad-id': { category: 'advertising', duration: '270 days', description: 'Amazon Ad System ID' },
+    'ad-privacy': { category: 'advertising', duration: '730 days', description: 'Amazon Ad Preferences' },
+    'yandexuid': { category: 'advertising', duration: '365 days', description: 'Yandex Metrica user ID' },
+    'ymex': { category: 'advertising', duration: '365 days', description: 'Yandex Metrica visitor' },
+    'm-b': { category: 'advertising', duration: '365 days', description: 'Quora browser ID' },
+    'm-uid': { category: 'advertising', duration: '365 days', description: 'Quora user ID' },
+    'sadb': { category: 'advertising', duration: '30 days', description: 'StackAdapt bidding data' },
+    'sadr': { category: 'advertising', duration: '30 days', description: 'StackAdapt retargeting' },
+    'TDID': { category: 'advertising', duration: '365 days', description: 'The Trade Desk ID' },
+    'TDCPM': { category: 'advertising', duration: '365 days', description: 'The Trade Desk CPM data' },
+    'mmapi': { category: 'advertising', duration: '30 days', description: 'MediaMath API tracking' },
+    'mmdata': { category: 'advertising', duration: '30 days', description: 'MediaMath campaign data' },
+    '_ga': { category: 'analytics', duration: '730 days', description: 'Google Analytics' },
+    '_gid': { category: 'analytics', duration: '1 day', description: 'Google Analytics' },
+    '_gat': { category: 'analytics', duration: '1 minute', description: 'Google Analytics throttle' },
     'PHPSESSID': { category: 'functional', duration: 'Session', description: 'PHP session' },
-    'cookie_consent': { category: 'functional', duration: '1 year', description: 'Stores cookie consent preferences' },
+    'cookie_consent': { category: 'functional', duration: '365 days', description: 'Consent preferences' },
+
+    // New Facebook cookies from your list
+    'lu': { category: 'advertising', duration: '2 years', description: 'Used to record whether the person chose to remain logged in (User ID and miscellaneous log in information)' },
+    'xs': { category: 'advertising', duration: '90 days', description: 'Used with c_user cookie to authenticate identity to Facebook (Session ID, creation time, authentication value)' },
+    'c_user': { category: 'advertising', duration: '90 days', description: 'Used with xs cookie to authenticate identity to Facebook (User ID)' },
+    'm_user': { category: 'advertising', duration: '90 days', description: 'Used to authenticate identity on Facebook mobile website (Email, User ID, authentication value)' },
+    'pl': { category: 'advertising', duration: '90 days', description: 'Records that a device or browser logged in via Facebook platform' },
+    'dbln': { category: 'advertising', duration: '2 years', description: 'Used to enable device-based logins (Login authentication values)' },
+    'aks': { category: 'advertising', duration: '30 days', description: 'Determines login state of a person visiting accountkit.com (Account kit access token)' },
+    'aksb': { category: 'advertising', duration: '30 minutes', description: 'Authenticates logins using Account Kit (Request time value)' },
+    'sfau': { category: 'advertising', duration: '1 day', description: 'Optimizes recovery flow after failed login attempts (Encrypted user ID, contact point, time stamp)' },
+    'ick': { category: 'advertising', duration: '2 years', description: 'Stores an encryption key used to encrypt cookies' },
+    'csm': { category: 'advertising', duration: '90 days', description: 'Insecure indicator' },
+    's': { category: 'advertising', duration: '90 days', description: 'Facebook browser identification, authentication, marketing cookies' },
+    'sb': { category: 'advertising', duration: '2 years', description: 'Facebook browser identification, authentication, marketing cookies' },
+    '_fbc': { category: 'advertising', duration: '2 years', description: 'Used for Facebook advertising products like real time bidding' },
+    'oo': { category: 'advertising', duration: '5 years', description: 'Ad opt-out cookie' },
+    'ddid': { category: 'advertising', duration: '28 days', description: 'Used to open specific location in advertiser app upon installation' },
+    'locale': { category: 'advertising', duration: '7 days', description: 'Contains display locale of last logged in user' },
+    'js_ver': { category: 'advertising', duration: '7 days', description: 'Records age of Facebook javascript files' },
+    'rc': { category: 'advertising', duration: '7 days', description: 'Used to optimize site performance for advertisers' },
+    'campaign_click_url': { category: 'advertising', duration: '30 days', description: 'Records Facebook URL landed on after clicking an ad' },
+    'usida': { category: 'advertising', duration: 'Session', description: 'Collects browser and unique identifier for targeted advertising' },
     
-    // WooCommerce cookies
-    'woocommerce_items_in_cart': { category: 'functional', duration: 'Session', description: 'WooCommerce cart items tracking' },
-    'woocommerce_cart_hash': { category: 'functional', duration: 'Session', description: 'WooCommerce cart hash' },
-    
-    // Advertising cookies
-    '_gcl_au': { category: 'advertising', duration: '3 months', description: 'Google Ads conversion' },
-    'IDE': { category: 'advertising', duration: '1 year', description: 'Google DoubleClick' },
-    'NID': { category: 'advertising', duration: '6 months', description: 'Google user tracking' },
-    
-    // Other common cookies
-    'gclid_tracker': { category: 'advertising', duration: 'Session', description: 'Tracks Google Click ID for conversions' },
-    'tk_ai': { category: 'analytics', duration: 'Session', description: 'Jetpack/Tumblr analytics' },
-    'external_id': { category: 'functional', duration: 'Session', description: 'External service identifier' }
+    // Facebook functional cookies
+    'wd': { category: 'functional', duration: 'Session', description: 'Stores browser window dimensions for page rendering optimization' },
+    'presence': { category: 'functional', duration: 'Session', description: 'Contains user chat state' }
 };
 
-// Complete EU language translations (same as before, but I'll include it for completeness)
+// Language translations (keeping only en and fr as requested)
 const translations = {
     en: {
         title: "We value your privacy",
@@ -168,12 +570,14 @@ const translations = {
         statsCustom: "Customized",
         statsTotal: "Total",
         statsPercentage: "Percentage",
+        statsLast1Day: "Last 1 Day",
         statsLast7Days: "Last 7 Days",
         statsLast30Days: "Last 30 Days",
         passwordPrompt: "Enter password to view analytics",
         passwordSubmit: "Submit",
         passwordIncorrect: "Incorrect password",
-        dashboardTitle: "Consent Analytics Dashboard"
+        dashboardTitle: "Consent Analytics Dashboard",
+        seeAnalytics: "See Consent Analytics"
     },
     fr: {
         title: "Nous respectons votre vie privée",
@@ -200,14 +604,16 @@ const translations = {
         statsCustom: "Personnalisé",
         statsTotal: "Total",
         statsPercentage: "Pourcentage",
+        statsLast1Day: "Dernier Jour",
         statsLast7Days: "7 Derniers Jours",
         statsLast30Days: "30 Derniers Jours",
         passwordPrompt: "Entrez le mot de passe pour voir les analyses",
         passwordSubmit: "Soumettre",
         passwordIncorrect: "Mot de passe incorrect",
-        dashboardTitle: "Tableau de bord des analyses de consentement"
+        dashboardTitle: "Tableau de bord des analyses de consentement",
+        seeAnalytics: "Voir les analyses de consentement"
     },
-      de: {
+     de: {
         title: "Wir schätzen Ihre Privatsphäre",
         description: "Wir verwenden Cookies, um Ihr Surferlebnis zu verbessern, personalisierte Anzeigen oder Inhalte bereitzustellen und unseren Datenverkehr zu analysieren. Wenn Sie auf \"Alle akzeptieren\" klicken, erklären Sie sich mit der Verwendung von Cookies einverstanden.",
         privacy: "Datenschutzrichtlinie",
@@ -232,8 +638,48 @@ const translations = {
         statsCustom: "Angepasst",
         statsTotal: "Gesamt",
         statsPercentage: "Prozentsatz",
+        statsLast1Day: "Letzter Tag",
         statsLast7Days: "Letzten 7 Tage",
-        statsLast30Days: "Letzten 30 Tage"
+        statsLast30Days: "Letzten 30 Tage",
+        passwordPrompt: "Passwort eingeben, um Analysen zu sehen",
+        passwordSubmit: "Einreichen",
+        passwordIncorrect: "Falsches Passwort",
+        dashboardTitle: "Zustimmungsanalyse-Dashboard",
+        seeAnalytics: "Zustimmungsanalysen anzeigen"
+    },
+  it: {
+        title: "Rispettiamo la tua privacy",
+        description: "Utilizziamo i cookie per migliorare la tua esperienza, fornire annunci o contenuti personalizzati e analizzare il nostro traffico. Cliccando su \"Accetta tutto\", acconsenti all'uso dei cookie.",
+        privacy: "Privacy Policy",
+        customize: "Personalizza",
+        reject: "Rifiuta tutto",
+        accept: "Accetta tutto",
+        essential: "Cookie essenziali",
+        essentialDesc: "Necessari per il funzionamento",
+        analytics: "Cookie analitici",
+        analyticsDesc: "Analizzano le interazioni",
+        performance: "Cookie prestazioni",
+        performanceDesc: "Migliorano le prestazioni",
+        advertising: "Cookie pubblicitari",
+        advertisingDesc: "Mostrano annunci pertinenti",
+        other: "Altri cookie",
+        otherDesc: "Cookie non categorizzati",
+        save: "Salva preferenze",
+        language: "Italiano",
+        statsTitle: "Statistiche del Consenso",
+        statsAccepted: "Accettato",
+        statsRejected: "Rifiutato",
+        statsCustom: "Personalizzato",
+        statsTotal: "Totale",
+        statsPercentage: "Percentuale",
+        statsLast1Day: "Ultimo 1 Giorno",
+        statsLast7Days: "Ultimi 7 Giorni",
+        statsLast30Days: "Ultimi 30 Giorni",
+        passwordPrompt: "Inserisci la password per visualizzare le analitiche",
+        passwordSubmit: "Invia",
+        passwordIncorrect: "Password errata",
+        dashboardTitle: "Dashboard Analisi Consenso",
+        seeAnalytics: "Vedi Analisi Consenso"
     },
     es: {
         title: "Valoramos su privacidad",
@@ -260,36 +706,14 @@ const translations = {
         statsCustom: "Personalizado",
         statsTotal: "Total",
         statsPercentage: "Porcentaje",
+        statsLast1Day: "Último Día",
         statsLast7Days: "Últimos 7 Días",
-        statsLast30Days: "Últimos 30 Días"
-    },
-    it: {
-        title: "Rispettiamo la tua privacy",
-        description: "Utilizziamo i cookie per migliorare la tua esperienza, fornire annunci o contenuti personalizzati e analizzare il nostro traffico. Cliccando su \"Accetta tutto\", acconsenti all'uso dei cookie.",
-        privacy: "Privacy Policy",
-        customize: "Personalizza",
-        reject: "Rifiuta tutto",
-        accept: "Accetta tutto",
-        essential: "Cookie essenziali",
-        essentialDesc: "Necessari per il funzionamento",
-        analytics: "Cookie analitici",
-        analyticsDesc: "Analizzano le interazioni",
-        performance: "Cookie prestazioni",
-        performanceDesc: "Migliorano le prestazioni",
-        advertising: "Cookie pubblicitari",
-        advertisingDesc: "Mostrano annunci pertinenti",
-        other: "Altri cookie",
-        otherDesc: "Cookie non categorizzati",
-        save: "Salva preferenze",
-        language: "Italiano",
-        statsTitle: "Statistiche del Consenso",
-        statsAccepted: "Accettato",
-        statsRejected: "Rifiutato",
-        statsCustom: "Personalizzato",
-        statsTotal: "Totale",
-        statsPercentage: "Percentuale",
-        statsLast7Days: "Ultimi 7 Giorni",
-        statsLast30Days: "Ultimi 30 Giorni"
+        statsLast30Days: "Últimos 30 Días",
+        passwordPrompt: "Ingrese contraseña para ver análisis",
+        passwordSubmit: "Enviar",
+        passwordIncorrect: "Contraseña incorrecta",
+        dashboardTitle: "Panel de Análisis de Consentimiento",
+        seeAnalytics: "Ver Estadísticas de Consentimiento"
     },
     pt: {
         title: "Valorizamos sua privacidade",
@@ -316,8 +740,14 @@ const translations = {
         statsCustom: "Personalizado",
         statsTotal: "Total",
         statsPercentage: "Percentagem",
+        statsLast1Day: "Último Dia",
         statsLast7Days: "Últimos 7 Dias",
-        statsLast30Days: "Últimos 30 Dias"
+        statsLast30Days: "Últimos 30 Dias",
+        passwordPrompt: "Digite a senha para ver análises",
+        passwordSubmit: "Enviar",
+        passwordIncorrect: "Senha incorreta",
+        dashboardTitle: "Painel de Análise de Consentimento",
+        seeAnalytics: "Ver Estatísticas de Consentimento"
     },
     nl: {
         title: "We waarderen uw privacy",
@@ -344,12 +774,18 @@ const translations = {
         statsCustom: "Aangepast",
         statsTotal: "Totaal",
         statsPercentage: "Percentage",
+        statsLast1Day: "Laatste Dag",
         statsLast7Days: "Laatste 7 Dagen",
-        statsLast30Days: "Laatste 30 Dagen"
+        statsLast30Days: "Laatste 30 Dagen",
+        passwordPrompt: "Voer wachtwoord in om analyses te zien",
+        passwordSubmit: "Indienen",
+        passwordIncorrect: "Onjuist wachtwoord",
+        dashboardTitle: "Dashboard Toestemmingsanalyses",
+        seeAnalytics: "Toestemmingsstatistieken bekijken"
     },
     pl: {
         title: "Szanujemy Twoją prywatność",
-        description: "Używamy plików cookie, aby poprawić Twoje doświadczenia przeglądania, dostarczać spersonalizowane reklamy lub treści i analizować nasz ruch. Klikając „Zaakceptuj wszystkie”, wyrażasz zgodę na używanie plików cookie.",
+        description: "Używamy plików cookie, aby poprawić Twoje doświadczenia przeglądania, dostarczać spersonalizowane reklamy lub treści i analizować nasz ruch. Klikając „Zaakceptuj wszystkie\", wyrażasz zgodę na używanie plików cookie.",
         privacy: "Polityka prywatności",
         customize: "Dostosuj",
         reject: "Odrzuć wszystkie",
@@ -372,8 +808,14 @@ const translations = {
         statsCustom: "Dostosowane",
         statsTotal: "Łącznie",
         statsPercentage: "Procent",
+        statsLast1Day: "Ostatni Dzień",
         statsLast7Days: "Ostatnie 7 Dni",
-        statsLast30Days: "Ostatnie 30 Dni"
+        statsLast30Days: "Ostatnie 30 Dni",
+        passwordPrompt: "Wpisz hasło, aby zobaczyć analizy",
+        passwordSubmit: "Zatwierdź",
+        passwordIncorrect: "Nieprawidłowe hasło",
+        dashboardTitle: "Panel statystyk zgód",
+        seeAnalytics: "Zobacz statystyki zgód"
     },
     sv: {
         title: "Vi värdesätter din integritet",
@@ -400,8 +842,14 @@ const translations = {
         statsCustom: "Anpassade",
         statsTotal: "Totalt",
         statsPercentage: "Procent",
+        statsLast1Day: "Senaste Dagen",
         statsLast7Days: "Senaste 7 Dagarna",
-        statsLast30Days: "Senaste 30 Dagarna"
+        statsLast30Days: "Senaste 30 Dagarna",
+        passwordPrompt: "Ange lösenord för att se analyser",
+        passwordSubmit: "Skicka",
+        passwordIncorrect: "Felaktigt lösenord",
+        dashboardTitle: "Samtyckesanalyspanel",
+        seeAnalytics: "Se samtyckesstatistik"
     },
     da: {
         title: "Vi værdsætter dit privatliv",
@@ -428,8 +876,14 @@ const translations = {
         statsCustom: "Tilpasset",
         statsTotal: "Total",
         statsPercentage: "Procentdel",
+        statsLast1Day: "Sidste Dag",
         statsLast7Days: "Sidste 7 Dage",
-        statsLast30Days: "Sidste 30 Dage"
+        statsLast30Days: "Sidste 30 Dage",
+        passwordPrompt: "Indtast adgangskode for at se analyser",
+        passwordSubmit: "Indsend",
+        passwordIncorrect: "Forkert adgangskode",
+        dashboardTitle: "Samtykkeanalysepanel",
+        seeAnalytics: "Se samtykkestatistik"
     },
     fi: {
         title: "Arvostamme yksityisyyttäsi",
@@ -456,8 +910,14 @@ const translations = {
         statsCustom: "Mukautettu",
         statsTotal: "Yhteensä",
         statsPercentage: "Prosenttia",
+        statsLast1Day: "Viimeinen Päivä",
         statsLast7Days: "Viimeiset 7 Päivää",
-        statsLast30Days: "Viimeiset 30 Päivää"
+        statsLast30Days: "Viimeiset 30 Päivää",
+        passwordPrompt: "Anna salasana nähdäksesi analyysit",
+        passwordSubmit: "Lähetä",
+        passwordIncorrect: "Väärä salasana",
+        dashboardTitle: "Suostumusanalyysien kojelauta",
+        seeAnalytics: "Näytä suostumustilastot"
     },
     el: {
         title: "Σεβόμαστε την ιδιωτικότητά σας",
@@ -484,8 +944,14 @@ const translations = {
         statsCustom: "Προσαρμοσμένα",
         statsTotal: "Σύνολο",
         statsPercentage: "Ποσοστό",
+        statsLast1Day: "Τελευταία Μέρα",
         statsLast7Days: "Τελευταίες 7 Ημέρες",
-        statsLast30Days: "Τελευταίες 30 Ημέρες"
+        statsLast30Days: "Τελευταίες 30 Ημέρες",
+        passwordPrompt: "Εισάγετε κωδικό για να δείτε αναλύσεις",
+        passwordSubmit: "Υποβολή",
+        passwordIncorrect: "Λάθος κωδικός",
+        dashboardTitle: "Πίνακας Ανάλυσης Συναινέσεων",
+        seeAnalytics: "Δείτε στατιστικά συναίνεσης"
     },
     hu: {
         title: "Tiszteljük az Ön privát szféráját",
@@ -512,8 +978,14 @@ const translations = {
         statsCustom: "Testreszabva",
         statsTotal: "Összesen",
         statsPercentage: "Százalék",
+        statsLast1Day: "Elmúlt Nap",
         statsLast7Days: "Elmúlt 7 Nap",
-        statsLast30Days: "Elmúlt 30 Nap"
+        statsLast30Days: "Elmúlt 30 Nap",
+        passwordPrompt: "Adja meg a jelszót az elemzések megtekintéséhez",
+        passwordSubmit: "Beküldés",
+        passwordIncorrect: "Hibás jelszó",
+        dashboardTitle: "Hozzájárulási Elemző Irányítópult",
+        seeAnalytics: "Hozzájárulási statisztikák megtekintése"
     },
     cs: {
         title: "Vaše soukromí je pro nás důležité",
@@ -540,8 +1012,14 @@ const translations = {
         statsCustom: "Přizpůsobeno",
         statsTotal: "Celkem",
         statsPercentage: "Procento",
+        statsLast1Day: "Poslední Den",
         statsLast7Days: "Posledních 7 Dní",
-        statsLast30Days: "Posledních 30 Dní"
+        statsLast30Days: "Posledních 30 Dní",
+        passwordPrompt: "Zadejte heslo pro zobrazení analýz",
+        passwordSubmit: "Odeslat",
+        passwordIncorrect: "Nesprávné heslo",
+        dashboardTitle: "Analytický Panel Souhlasu",
+        seeAnalytics: "Zobrazit statistiky souhlasu"
     },
     ro: {
         title: "Respectăm confidențialitatea dumneavoastră",
@@ -568,8 +1046,14 @@ const translations = {
         statsCustom: "Personalizat",
         statsTotal: "Total",
         statsPercentage: "Procent",
+        statsLast1Day: "Ultima Zi",
         statsLast7Days: "Ultimele 7 Zile",
-        statsLast30Days: "Ultimele 30 Zile"
+        statsLast30Days: "Ultimele 30 Zile",
+        passwordPrompt: "Introduceți parola pentru a vedea analizele",
+        passwordSubmit: "Trimite",
+        passwordIncorrect: "Parolă incorectă",
+        dashboardTitle: "Tablou de Bord Analize Consimțământ",
+        seeAnalytics: "Vezi statistici consimțământ"
     },
     sk: {
         title: "Rešpektujeme vaše súkromie",
@@ -596,8 +1080,14 @@ const translations = {
         statsCustom: "Prispôsobené",
         statsTotal: "Celkom",
         statsPercentage: "Percento",
+        statsLast1Day: "Posledný Deň",
         statsLast7Days: "Posledných 7 Dní",
-        statsLast30Days: "Posledných 30 Dní"
+        statsLast30Days: "Posledných 30 Dní",
+        passwordPrompt: "Zadajte heslo pre zobrazenie analýz",
+        passwordSubmit: "Odoslať",
+        passwordIncorrect: "Nesprávne heslo",
+        dashboardTitle: "Analytický Panel Súhlasu",
+        seeAnalytics: "Zobraziť štatistiky súhlasu"
     },
     sl: {
         title: "Spoštujemo vašo zasebnost",
@@ -624,8 +1114,14 @@ const translations = {
         statsCustom: "Prilagojeno",
         statsTotal: "Skupaj",
         statsPercentage: "Odstotek",
+        statsLast1Day: "Zadnji Dan",
         statsLast7Days: "Zadnjih 7 Dni",
-        statsLast30Days: "Zadnjih 30 Dni"
+        statsLast30Days: "Zadnjih 30 Dni",
+        passwordPrompt: "Vnesite geslo za ogled analiz",
+        passwordSubmit: "Pošlji",
+        passwordIncorrect: "Napačno geslo",
+        dashboardTitle: "Nadzorna plošča analize privolitve",
+        seeAnalytics: "Ogled statistike privolitve"
     },
     bg: {
         title: "Уважаваме вашата поверителност",
@@ -652,8 +1148,14 @@ const translations = {
         statsCustom: "Персонализирано",
         statsTotal: "Общо",
         statsPercentage: "Процент",
+        statsLast1Day: "Последният Ден",
         statsLast7Days: "Последните 7 Дни",
-        statsLast30Days: "Последните 30 Дни"
+        statsLast30Days: "Последните 30 Дни",
+        passwordPrompt: "Въведете парола за преглед на анализи",
+        passwordSubmit: "Изпращане",
+        passwordIncorrect: "Грешна парола",
+        dashboardTitle: "Табло за анализ на съгласие",
+        seeAnalytics: "Вижте статистика за съгласие"
     },
     hr: {
         title: "Poštujemo vašu privatnost",
@@ -680,8 +1182,14 @@ const translations = {
         statsCustom: "Prilagođeno",
         statsTotal: "Ukupno",
         statsPercentage: "Postotak",
+        statsLast1Day: "Zadnji Dan",
         statsLast7Days: "Zadnjih 7 Dana",
-        statsLast30Days: "Zadnjih 30 Dana"
+        statsLast30Days: "Zadnjih 30 Dana",
+        passwordPrompt: "Unesite lozinku za pregled analize",
+        passwordSubmit: "Pošalji",
+        passwordIncorrect: "Pogrešna lozinka",
+        dashboardTitle: "Nadzorna ploča analize pristanka",
+        seeAnalytics: "Pogledajte statistiku pristanka"
     },
     lt: {
         title: "Mes gerbiame jūsų privatumą",
@@ -708,8 +1216,14 @@ const translations = {
         statsCustom: "Pritaikyta",
         statsTotal: "Iš viso",
         statsPercentage: "Procentas",
+        statsLast1Day: "Paskutinė Diena",
         statsLast7Days: "Paskutinės 7 Dienos",
-        statsLast30Days: "Paskutinės 30 Dienų"
+        statsLast30Days: "Paskutinės 30 Dienų",
+        passwordPrompt: "Įveskite slaptažodį analizei peržiūrėti",
+        passwordSubmit: "Pateikti",
+        passwordIncorrect: "Neteisingas slaptažodis",
+        dashboardTitle: "Sutikimo analizės prietaisų skydelis",
+        seeAnalytics: "Peržiūrėti sutikimo statistiką"
     },
     lv: {
         title: "Mēs cienām jūsu privātumu",
@@ -736,8 +1250,14 @@ const translations = {
         statsCustom: "Pielāgoti",
         statsTotal: "Kopā",
         statsPercentage: "Procenti",
+        statsLast1Day: "Pēdējā Diena",
         statsLast7Days: "Pēdējās 7 Dienas",
-        statsLast30Days: "Pēdējās 30 Dienas"
+        statsLast30Days: "Pēdējās 30 Dienas",
+        passwordPrompt: "Ievadiet paroli, lai skatītu analīzi",
+        passwordSubmit: "Iesniegt",
+        passwordIncorrect: "Nepareiza parole",
+        dashboardTitle: "Piekrišanas analīzes panelis",
+        seeAnalytics: "Skatīt piekrišanas statistiku"
     },
     et: {
         title: "Me austame teie privaatsust",
@@ -764,8 +1284,14 @@ const translations = {
         statsCustom: "Kohandatud",
         statsTotal: "Kokku",
         statsPercentage: "Protsent",
+        statsLast1Day: "Viimane Päev",
         statsLast7Days: "Viimased 7 Päeva",
-        statsLast30Days: "Viimased 30 Päeva"
+        statsLast30Days: "Viimased 30 Päeva",
+        passwordPrompt: "Sisesta parool analüüside vaatamiseks",
+        passwordSubmit: "Esita",
+        passwordIncorrect: "Vale parool",
+        dashboardTitle: "Nõusoleku analüüside töölaud",
+        seeAnalytics: "Vaata nõusoleku statistikat"
     },
     mt: {
         title: "Nirrispettaw il-privatezza tiegħek",
@@ -792,14 +1318,19 @@ const translations = {
         statsCustom: "Ippersonalizzat",
         statsTotal: "Total",
         statsPercentage: "Perċentwal",
-        statsLast7Days: "Aħħar 7 Ġranet",
-        statsLast30Days: "Aħħar 30 Ġranet"
+        statsLast1Day: "L-Aħħar Jum",
+        statsLast7Days: "L-Aħħar 7 Ġranet",
+        statsLast30Days: "L-Aħħar 30 Ġranet",
+        passwordPrompt: "Idħol il-password biex tara l-analiżi",
+        passwordSubmit: "Ibgħat",
+        passwordIncorrect: "Password mhux korretta",
+        dashboardTitle: "Dashboard tal-Analiżi tal-Kunsens",
+        seeAnalytics: "Ara l-Istatistika tal-Kunsens"
     },
-
-    // ... (keep all other language translations the same)
+ // ... (keep all other language translations the same)
 };
 
-// Country to language mapping for auto-translation
+// Country to language mapping for auto-translation (keeping all mappings)
 const countryLanguageMap = {
     // EU Countries
     'AT': 'de',     // Austria
@@ -870,13 +1401,123 @@ let consentAnalytics = {
         rejected: 0,
         custom: 0
     },
-    daily: {},
-    weekly: {},
-    monthly: {}
+    daily: {}
 };
 
 // Password protection for analytics
 let isDashboardAuthenticated = false;
+
+// Banner scheduling variables
+let bannerTimer = null;
+let bannerShown = false;
+
+// Location data storage
+// Location data storage with immediate initialization
+// Location data storage - start empty
+let locationData = {};
+
+// First try to load from session storage if available
+const savedLocation = sessionStorage.getItem('locationData');
+if (savedLocation) {
+    locationData = JSON.parse(savedLocation);
+} else {
+    // If no saved data, fetch fresh data
+    fetchLocationData().then(() => {
+        // Push to dataLayer after we have the data
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+            'event': 'locationInitialized',
+            'location_data': locationData,
+            'timestamp': new Date().toISOString()
+        });
+    });
+}
+// Function to fetch location data
+async function fetchLocationData() {
+    // Skip if we already have valid location data (optional safety check)
+    if (locationData.country && locationData.country !== 'Unknown') {
+        return locationData;
+    }
+
+    try {
+        const response = await fetch('https://ipinfo.io/json?token=4c1e5d00e0ac93');
+        if (!response.ok) throw new Error('Failed to fetch location');
+        
+        const payload = await response.json();
+        
+        // Update locationData with actual values
+        locationData = {
+            continent: getContinentFromCountry(payload.country) || "Unknown",
+            country: payload.country || "Unknown",
+            city: payload.city || "Unknown",
+            zip: payload.postal || "Unknown",
+            ip: payload.ip || "Unknown",
+            street: payload.loc || "Unknown",
+            region: payload.region || "Unknown",
+            timezone: payload.timezone || "Unknown",
+            isp: payload.org || "Unknown",
+            language: (navigator.language || "Unknown").split("-")[0]
+        };
+
+        // Save to session storage
+        sessionStorage.setItem('locationData', JSON.stringify(locationData));
+        
+        // Push to dataLayer - THIS IS WHERE IT HAPPENS NOW
+        window.dataLayer.push({
+            'event': 'locationRetrieved',
+            'location_data': locationData,
+            'timestamp': new Date().toISOString()
+        });
+        
+        return locationData;
+        
+    } catch (error) {
+        console.error('Error fetching location:', error);
+        // Set defaults if API fails
+        locationData = {
+            continent: "Unknown",
+            country: "Unknown",
+            city: "Unknown",
+            zip: "Unknown",
+            ip: "Unknown",
+            street: "Unknown",
+            region: "Unknown",
+            timezone: "Unknown",
+            isp: "Unknown",
+            language: (navigator.language || "Unknown").split("-")[0]
+        };
+        return locationData;
+    }
+}
+
+// Function to map countries to their respective continents
+function getContinentFromCountry(countryCode) {
+    var continentMap = {
+        "AF": "Africa", "AL": "Europe", "DZ": "Africa", "AS": "Oceania", "AD": "Europe", "AO": "Africa",
+        "AR": "South America", "AM": "Asia", "AU": "Oceania", "AT": "Europe", "AZ": "Asia", "BS": "North America",
+        "BH": "Asia", "BD": "Asia", "BB": "North America", "BY": "Europe", "BE": "Europe", "BZ": "North America",
+        "BJ": "Africa", "BT": "Asia", "BO": "South America", "BA": "Europe", "BW": "Africa", "BR": "South America",
+        "BN": "Asia", "BG": "Europe", "BF": "Africa", "BI": "Africa", "BJ": "Africa", "BD": "Asia",
+        "NL": "Europe", "US": "North America", "CA": "North America", "GB": "Europe", "CN": "Asia", "IN": "Asia",
+        "ZA": "Africa", "AU": "Oceania", "NZ": "Oceania", "DE": "Europe", "FR": "Europe", "IT": "Europe",
+        "ES": "Europe", "PL": "Europe", "SE": "Europe", "NO": "Europe", "DK": "Europe", "RU": "Europe",
+        "BR": "South America", "MX": "North America", "JP": "Asia", "KR": "Asia", "AE": "Asia", "SG": "Asia",
+        "TH": "Asia", "ID": "Asia", "PH": "Asia", "MY": "Asia", "KH": "Asia", "VN": "Asia", "PK": "Asia",
+        "EG": "Africa", "KE": "Africa", "NG": "Africa", "ET": "Africa", "TZ": "Africa", "UG": "Africa",
+        "GH": "Africa", "MA": "Africa", "MO": "Asia", "LK": "Asia", "BD": "Asia", "IQ": "Asia",
+        "CO": "South America", "CL": "South America", "PE": "South America", "VE": "South America",
+        "BO": "South America", "PY": "South America", "SR": "South America", "EC": "South America",
+        "GT": "North America", "HT": "North America", "DO": "North America", "CR": "North America",
+        "CU": "North America", "JM": "North America", "BS": "North America", "NI": "North America",
+        "BZ": "North America", "PA": "North America", "SV": "North America", "GT": "North America",
+        "RU": "Europe", "BG": "Europe", "RO": "Europe", "UA": "Europe", "CZ": "Europe", "HU": "Europe",
+        "SK": "Europe", "HR": "Europe", "SI": "Europe", "MK": "Europe", "RS": "Europe", "ME": "Europe",
+        "AL": "Europe", "AM": "Asia", "AZ": "Asia", "GE": "Asia", "MN": "Asia", "NP": "Asia", "BT": "Asia",
+        "KG": "Asia", "TJ": "Asia", "UZ": "Asia", "KZ": "Asia", "TM": "Asia"
+    };
+
+    return continentMap[countryCode] || "Unknown";
+}
 
 // Load analytics data from localStorage
 function loadAnalyticsData() {
@@ -924,62 +1565,10 @@ function updateConsentStats(status) {
         consentAnalytics.daily[today].custom++;
     }
     
-    // Update weekly and monthly stats
-    updateTimeBasedStats(today, status);
-    
     saveAnalyticsData();
 }
 
-// Update weekly and monthly stats
-function updateTimeBasedStats(date, status) {
-    const dateObj = new Date(date);
-    const year = dateObj.getFullYear();
-    const month = dateObj.getMonth() + 1;
-    const week = getWeekNumber(dateObj);
-    
-    // Weekly stats
-    const weekKey = `${year}-W${week}`;
-    if (!consentAnalytics.weekly[weekKey]) {
-        consentAnalytics.weekly[weekKey] = {
-            accepted: 0,
-            rejected: 0,
-            custom: 0
-        };
-    }
-    
-    // Monthly stats
-    const monthKey = `${year}-${month}`;
-    if (!consentAnalytics.monthly[monthKey]) {
-        consentAnalytics.monthly[monthKey] = {
-            accepted: 0,
-            rejected: 0,
-            custom: 0
-        };
-    }
-    
-    // Update counts
-    if (status === 'accepted') {
-        consentAnalytics.weekly[weekKey].accepted++;
-        consentAnalytics.monthly[monthKey].accepted++;
-    } else if (status === 'rejected') {
-        consentAnalytics.weekly[weekKey].rejected++;
-        consentAnalytics.monthly[monthKey].rejected++;
-    } else if (status === 'custom') {
-        consentAnalytics.weekly[weekKey].custom++;
-        consentAnalytics.monthly[monthKey].custom++;
-    }
-}
-
-// Helper function to get week number
-function getWeekNumber(date) {
-    const d = new Date(date);
-    d.setHours(0, 0, 0, 0);
-    d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
-    const week1 = new Date(d.getFullYear(), 0, 4);
-    return 1 + Math.round(((d - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
-}
-
-// Generate analytics dashboard HTML
+// Generate analytics dashboard HTML with 1 day, 7 days, and 30 days sections
 function generateAnalyticsDashboard(language = 'en') {
     const lang = translations[language] || translations.en;
     
@@ -991,6 +1580,11 @@ function generateAnalyticsDashboard(language = 'en') {
     const acceptedPercent = total > 0 ? Math.round((consentAnalytics.total.accepted / total) * 100) : 0;
     const rejectedPercent = total > 0 ? Math.round((consentAnalytics.total.rejected / total) * 100) : 0;
     const customPercent = total > 0 ? Math.round((consentAnalytics.total.custom / total) * 100) : 0;
+    
+    // Get last 1 day data
+    const today = new Date().toISOString().split('T')[0];
+    const last1Day = {};
+    last1Day[today] = consentAnalytics.daily[today] || { accepted: 0, rejected: 0, custom: 0 };
     
     // Get last 7 days data
     const last7Days = {};
@@ -1037,6 +1631,33 @@ function generateAnalyticsDashboard(language = 'en') {
         </div>
         
         <div class="time-based-stats">
+            <div class="time-stat">
+                <h4>${lang.statsLast1Day}</h4>
+                <div class="stat-bars">
+                    ${Object.entries(last1Day).map(([date, data]) => {
+                        const dayTotal = data.accepted + data.rejected + data.custom;
+                        const dayAcceptedPercent = dayTotal > 0 ? (data.accepted / dayTotal) * 100 : 0;
+                        const dayRejectedPercent = dayTotal > 0 ? (data.rejected / dayTotal) * 100 : 0;
+                        const dayCustomPercent = dayTotal > 0 ? (data.custom / dayTotal) * 100 : 0;
+                        
+                        return `
+                        <div class="stat-bar-container">
+                            <div class="stat-bar-label">${date}</div>
+                            <div class="stat-bar">
+                                <div class="stat-bar-segment accepted" style="width: ${dayAcceptedPercent}%"></div>
+                                <div class="stat-bar-segment custom" style="width: ${dayCustomPercent}%"></div>
+                                <div class="stat-bar-segment rejected" style="width: ${dayRejectedPercent}%"></div>
+                            </div>
+                            <div class="stat-bar-legend">
+                                <span>${data.accepted} ${lang.statsAccepted}</span>
+                                <span>${data.custom} ${lang.statsCustom}</span>
+                                <span>${data.rejected} ${lang.statsRejected}</span>
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>
+            </div>
+            
             <div class="time-stat">
                 <h4>${lang.statsLast7Days}</h4>
                 <div class="stat-bars">
@@ -1114,7 +1735,6 @@ function isDomainAllowed() {
     const currentDomain = window.location.hostname;
     return config.allowedDomains.some(domain => {
         if (domain.startsWith('.')) {
-            // Match subdomains (e.g., .example.com matches sub.example.com)
             return currentDomain === domain.substring(1) || currentDomain.endsWith(domain);
         }
         return currentDomain === domain;
@@ -1122,8 +1742,14 @@ function isDomainAllowed() {
 }
 
 // Check geo-targeting restrictions
+// Replace the existing checkGeoTargeting function with this:
 function checkGeoTargeting(geoData) {
-    // Check blocked locations first
+    // If we don't have country data, allow by default (or deny if you prefer)
+    if (!geoData || !geoData.country || geoData.country === 'Unknown') {
+        return !config.geoConfig.euOnly; // If EU-only mode, deny unknown locations
+    }
+
+    // Check blocked locations first (highest priority)
     if (config.geoConfig.blockedCountries.length > 0 && 
         config.geoConfig.blockedCountries.includes(geoData.country)) {
         return false;
@@ -1138,7 +1764,21 @@ function checkGeoTargeting(geoData) {
         config.geoConfig.blockedCities.includes(geoData.city)) {
         return false;
     }
-    
+
+    // Handle EU-only mode
+    if (config.geoConfig.euOnly) {
+        return EU_COUNTRIES.includes(geoData.country);
+    }
+
+    // Check if specific regions are specified
+    if (config.geoConfig.specificRegions.length > 0) {
+       // if (config.geoConfig.specificRegions.includes('EU') && 
+          //  EU_COUNTRIES.includes(geoData.country)) {
+           // return true;
+     //   }
+        return config.geoConfig.specificRegions.includes(geoData.region);
+    }
+
     // Check allowed locations (if any restrictions are set)
     if (config.geoConfig.allowedCountries.length > 0 && 
         !config.geoConfig.allowedCountries.includes(geoData.country)) {
@@ -1155,6 +1795,7 @@ function checkGeoTargeting(geoData) {
         return false;
     }
     
+    // If no restrictions, allow by default
     return true;
 }
 
@@ -1188,12 +1829,9 @@ function detectUserLanguage(geoData) {
 
 // Get available languages for dropdown
 function getAvailableLanguages() {
-    // If specific languages are configured, use those
     if (config.languageConfig.availableLanguages.length > 0) {
         return config.languageConfig.availableLanguages.filter(lang => translations[lang]);
     }
-    
-    // Otherwise return all available languages
     return Object.keys(translations);
 }
 
@@ -1206,7 +1844,7 @@ function changeLanguage(languageCode) {
     if (banner) {
         banner.querySelector('h2').textContent = lang.title;
         banner.querySelector('p').textContent = lang.description;
-        banner.querySelector('.privacy-policy-link').textContent = lang.privacy;
+        banner.querySelector('.main-privacy-policy-link').textContent = lang.privacy;
         banner.querySelector('#acceptAllBtn').textContent = lang.accept;
         banner.querySelector('#adjustConsentBtn').textContent = lang.customize;
         banner.querySelector('#rejectAllBtn').textContent = lang.reject;
@@ -1217,7 +1855,6 @@ function changeLanguage(languageCode) {
     if (modal) {
         modal.querySelector('h2').textContent = lang.title;
         
-        // Update category headers and descriptions
         const categories = {
             'functional': 'essential',
             'analytics': 'analytics',
@@ -1231,14 +1868,19 @@ function changeLanguage(languageCode) {
             if (categoryElement) {
                 const container = categoryElement.closest('.cookie-category');
                 container.querySelector('h3').textContent = lang[key];
-                container.querySelector('p').textContent = lang[`${categoryKey}Desc`];
+                container.querySelector('p').textContent = lang[`${key}Desc`];
             }
         }
         
-        // Update buttons
         modal.querySelector('#rejectAllSettingsBtn').textContent = lang.reject;
         modal.querySelector('#saveSettingsBtn').textContent = lang.save;
         modal.querySelector('#acceptAllSettingsBtn').textContent = lang.accept;
+        
+        // Update "See Consent Analytics" link
+        const seeAnalyticsLink = modal.querySelector('.see-analytics-link');
+        if (seeAnalyticsLink) {
+            seeAnalyticsLink.textContent = lang.seeAnalytics;
+        }
     }
     
     // Update floating button title
@@ -1248,153 +1890,36 @@ function changeLanguage(languageCode) {
     }
     
     // Update analytics dashboard if visible
-    const dashboard = document.querySelector('.analytics-dashboard');
-    if (dashboard) {
-        dashboard.innerHTML = generateAnalyticsDashboard(languageCode);
+    const dashboardModal = document.getElementById('cookieAnalyticsModal');
+    if (dashboardModal && dashboardModal.style.display === 'flex') {
+        if (config.analytics.passwordProtect && !isDashboardAuthenticated) {
+            dashboardModal.querySelector('.cookie-analytics-body').innerHTML = generatePasswordPrompt(languageCode);
+            setupPasswordPromptEvents();
+        } else {
+            dashboardModal.querySelector('.cookie-analytics-body').innerHTML = generateAnalyticsDashboard(languageCode);
+        }
     }
-    
+
+    // Update analytics dashboard title if visible
+    const dashboardTitle = document.querySelector('.cookie-analytics-header h2');
+    if (dashboardTitle) {
+        dashboardTitle.textContent = lang.dashboardTitle;
+    }
+
     // Update password prompt if visible
-    const passwordPrompt = document.querySelector('.password-prompt');
-    if (passwordPrompt) {
-        passwordPrompt.innerHTML = generatePasswordPrompt(languageCode);
-        setupPasswordPromptEvents();
+    const passwordPrompt = document.querySelector('.password-prompt h3');
+    const passwordSubmit = document.getElementById('dashboardPasswordSubmit');
+    const passwordError = document.getElementById('passwordError');
+    if (passwordPrompt) passwordPrompt.textContent = lang.passwordPrompt;
+    if (passwordSubmit) passwordSubmit.textContent = lang.passwordSubmit;
+    if (passwordError && passwordError.textContent) {
+        passwordError.textContent = translations[languageCode].passwordIncorrect;
     }
     
     // Store selected language in cookie
     if (config.behavior.rememberLanguage) {
         setCookie('preferred_language', languageCode, 365);
     }
-}
-
-// Main initialization with enhanced cookie scanning
-document.addEventListener('DOMContentLoaded', function() {
-    // First check if we should run on this domain
-    if (!isDomainAllowed()) {
-        console.log('Cookie consent banner disabled for this domain');
-        return;
-    }
-    
-    // Load analytics data
-    if (config.analytics.enabled) {
-        loadAnalyticsData();
-    }
-    
-    // Get geo data from dataLayer or detect
-    let geoData = {};
-    if (window.dataLayer && window.dataLayer.length > 0) {
-        const geoItem = window.dataLayer.find(item => item.country || item.region || item.city);
-        if (geoItem) {
-            geoData = {
-                country: geoItem.country || '',
-                region: geoItem.region || '',
-                city: geoItem.city || '',
-                language: geoItem.language || ''
-            };
-        }
-    }
-    
-    // Check geo-targeting restrictions
-    if (!checkGeoTargeting(geoData)) {
-        console.log('Cookie consent banner disabled for this location');
-        return;
-    }
-    
-    // Detect language
-    const detectedLanguage = detectUserLanguage(geoData);
-    
-    const detectedCookies = scanAndCategorizeCookies();
-    if (detectedCookies.uncategorized.length > 0) {
-        console.log('Uncategorized cookies found:', detectedCookies.uncategorized);
-        // Try to automatically categorize unknown cookies
-        autoCategorizeCookies(detectedCookies.uncategorized).forEach(cookie => {
-            const category = determineCookieCategory(cookie.name);
-            if (category && category !== 'uncategorized') {
-                detectedCookies[category].push(cookie);
-                detectedCookies.uncategorized = detectedCookies.uncategorized.filter(c => c.name !== cookie.name);
-            }
-        });
-    }
-    
-    injectConsentHTML(detectedCookies, detectedLanguage);
-    initializeCookieConsent(detectedCookies, detectedLanguage);
-    
-    if (getCookie('cookie_consent')) {
-        showFloatingButton();
-    }
-    
-    // Track marketing parameters
-    trackMarketingParameters();
-    
-    // Enhanced periodic cookie scan with validation
-    setInterval(() => {
-        const newCookies = scanAndCategorizeCookies();
-        if (JSON.stringify(newCookies) !== JSON.stringify(detectedCookies)) {
-            updateCookieTables(newCookies);
-        }
-    }, 30000); // Scan every 30 seconds
-    
-    // Handle scroll-based acceptance
-    if (config.behavior.acceptOnScroll) {
-        window.addEventListener('scroll', handleScrollAcceptance);
-    }
-});
-
-// Handle scroll-based acceptance
-function handleScrollAcceptance() {
-    if (getCookie('cookie_consent')) {
-        window.removeEventListener('scroll', handleScrollAcceptance);
-        return;
-    }
-    
-    const scrollPercentage = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
-    if (scrollPercentage > 50) { // Accept if scrolled more than 50%
-        acceptAllCookies();
-        hideCookieBanner();
-        showFloatingButton();
-        window.removeEventListener('scroll', handleScrollAcceptance);
-    }
-}
-
-// Function to automatically categorize unknown cookies
-function autoCategorizeCookies(uncategorizedCookies) {
-    return uncategorizedCookies.map(cookie => {
-        const category = determineCookieCategory(cookie.name);
-        if (category) {
-            cookieDatabase[cookie.name] = {
-                category: category,
-                duration: cookie.duration,
-                description: cookie.description || 'Automatically categorized'
-            };
-        }
-        return cookie;
-    });
-}
-
-// Function to determine cookie category based on name patterns
-function determineCookieCategory(cookieName) {
-    const lowerName = cookieName.toLowerCase();
-    
-    // Analytics patterns
-    if (/_ga|_gid|_gat|analytics|stats|measure|track|tk_ai/.test(lowerName)) {
-        return 'analytics';
-    }
-    
-    // Advertising patterns
-    if (/_gcl|_fbp|fr|ad|ads|tracking|marketing|doubleclick|gclid/.test(lowerName)) {
-        return 'advertising';
-    }
-    
-    // Functional patterns
-    if (/sess|token|auth|login|user|pref|settings|cart|checkout|hash|items/.test(lowerName)) {
-        return 'functional';
-    }
-    
-    // Performance patterns
-    if (/perf|speed|optimize|cdn|cache/.test(lowerName)) {
-        return 'performance';
-    }
-    
-    return null;
 }
 
 // Enhanced cookie scanning function with better matching
@@ -1457,29 +1982,38 @@ function getCookieDuration(name) {
     return "Session";
 }
 
-function trackMarketingParameters() {
-    const params = new URLSearchParams(window.location.search);
-    const marketingData = {};
-    
-    // Check for common marketing parameters
-    if (params.has('gclid')) marketingData.gclid = params.get('gclid');
-    if (params.has('fbclid')) marketingData.fbclid = params.get('fbclid');
-    if (params.has('utm_source')) marketingData.utm_source = params.get('utm_source');
-    if (params.has('utm_medium')) marketingData.utm_medium = params.get('utm_medium');
-    if (params.has('utm_campaign')) marketingData.utm_campaign = params.get('utm_campaign');
-    
-    if (Object.keys(marketingData).length > 0) {
-        window.dataLayer.push({
-            'event': 'marketingParameters',
-            ...marketingData
-        });
-    }
+// Generate cookie table with mobile-friendly display
+function generateCookieTable(cookies) {
+    return `
+    <table class="main-cookie-details-table">
+        <thead>
+            <tr>
+                <th>Cookie Name</th>
+                <th>Value</th>
+                <th>Duration</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${cookies.map(cookie => `
+            <tr>
+                <td><code>${cookie.name}</code></td>
+                <td class="cookie-value-cell">
+                    <span class="cookie-value-full" style="display:none;">${cookie.value}</span>
+                    <span class="cookie-value-truncated">${cookie.value.substring(0, 20)}${cookie.value.length > 20 ? '...' : ''}</span>
+                    ${cookie.value.length > 20 ? '<button class="toggle-cookie-value" data-state="truncated">Show full</button>' : ''}
+                </td>
+                <td>${cookie.duration}</td>
+                <td>${cookie.description}</td>
+            </tr>`).join('')}
+        </tbody>
+    </table>`;
 }
 
+// Inject all HTML elements into the page
 function injectConsentHTML(detectedCookies, language = 'en') {
     const lang = translations[language] || translations.en;
     const availableLanguages = getAvailableLanguages();
-    const currentTheme = config.uiTheme === 'classic' ? classicColorScheme : colorScheme;
     
     // Generate cookie tables for each category
     const generateCategorySection = (category) => {
@@ -1491,7 +2025,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         <div class="cookie-category">
             <div class="toggle-container">
                 <h3>${lang[categoryKey]}</h3>
-                <label class="toggle-switch">
+                <label class="main-toggle-switch" data-ms-consent="ad_storage">
                     <input type="checkbox" data-category="${category}" ${isEssential ? 'checked disabled' : ''}>
                     <span class="toggle-slider"></span>
                 </label>
@@ -1502,7 +2036,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
                     <span>Cookie Details</span>
                     <span class="toggle-details">+</span>
                 </div>
-                <div class="cookie-details-content" style="display: none;">
+                <div class="main-cookie-details-content" style="display: none;">
                     ${cookies.length > 0 ? 
                         generateCookieTable(cookies) : 
                         `<p class="no-cookies-message">No cookies in this category detected.</p>`}
@@ -1522,10 +2056,16 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     </div>` : '';
     
     // Generate admin dashboard button if analytics enabled
-    const adminButton = config.analytics.enabled && config.analytics.showDashboard ? `
+    const adminButton = config.analytics.enabled && config.analytics.showDashboard && config.behavior.showAdminButton ? `
     <div id="cookieAdminButton" class="cookie-admin-button" title="${lang.dashboardTitle}">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
-            <path d="M288 160C252.7 160 224 188.7 224 224C224 259.3 252.7 288 288 288C323.3 288 352 259.3 352 224C352 188.7 323.3 160 288 160zM95.4 112.6C142.5 68.84 207.2 32 288 32C368.8 32 433.5 68.84 480.6 112.6C527.4 156 558.7 207.1 573.5 243.7C576.8 251.6 576.8 260.4 573.5 268.3C558.7 304 527.4 355.1 480.6 399.4C433.5 443.2 368.8 480 288 480C207.2 480 142.5 443.2 95.4 399.4C48.6 355.1 17.3 304 2.5 268.3C-.8 260.4-.8 251.6 2.5 243.7C17.3 207.1 48.6 156 95.4 112.6V112.6zM288 80C218.6 80 160 138.6 160 208C160 277.4 218.6 336 288 336C357.4 336 416 277.4 416 208C416 138.6 357.4 80 288 80zM44.96 256C56.53 286.1 83.51 329.2 124.4 368C165.3 406.8 219.1 432 288 432C356.9 432 410.7 406.8 451.6 368C492.5 329.2 519.5 286.1 531 256C519.5 225.9 492.5 182.8 451.6 144C410.7 105.2 356.9 80 288 80C219.1 80 165.3 105.2 124.4 144C83.51 182.8 56.53 225.9 44.96 256V256z"/>
+        <svg viewBox="0 0 24 24" width="28" height="28" xmlns="http://www.w3.org/2000/svg" fill="currentColor" stroke="none">
+            <title>Admin Dashboard</title>
+            <path d="M4.75,20.75A.25.25,0,0,0,5,20.5v-2a1,1,0,0,0-1-1H2a1,1,0,0,0-1,1v2a.25.25,0,0,0,.25.25Z"/>
+            <path d="M10.75,20.75A.25.25,0,0,0,11,20.5v-7a1,1,0,0,0-1-1H8a1,1,0,0,0-1,1v7a.25.25,0,0,0,.25.25Z"/>
+            <path d="M16.75,20.75A.25.25,0,0,0,17,20.5v-5a1,1,0,0,0-1-1H14a1,1,0,0,0-1,1v5a.25.25,0,0,0,.25.25Z"/>
+            <path d="M22.75,20.75A.25.25,0,0,0,23,20.5V8.5a1,1,0,0,0-1-1H20a1,1,0,0,0-1,1v12a.25.25,0,0,0,.25.25Z"/>
+            <path d="M3.5,13.5a2,2,0,0,0,2-2,1.981,1.981,0,0,0-.1-.6l3.167-2.64A1.955,1.955,0,0,0,11.011,7.8l2.5.834A2,2,0,0,0,17.5,8.5a1.964,1.964,0,0,0-.231-.912l3.287-3.835A1.994,1.994,0,1,0,19.5,2a1.962,1.962,0,0,0,.093.571L16.13,6.612a1.932,1.932,0,0,0-2.141.593l-2.5-.833A1.995,1.995,0,0,0,7.6,7.1L4.436,9.744A1.975,1.975,0,0,0,3.5,9.5a2,2,0,0,0,0,4Z"/>
+            <path d="M23,22H1a1.016,1.016,0,0,0-1,1,1,1,0,0,0,1,1H23a1,1,0,0,0,1-1A1.015,1.015,0,0,0,23,22Z"/>
         </svg>
     </div>` : '';
     
@@ -1534,15 +2074,17 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     <div id="cookieConsentBanner" class="cookie-consent-banner">
         <div class="cookie-consent-container">
             ${languageSelector}
-            <div class="cookie-consent-content">
+            <div class="main-cookie-consent-content">
                 <h2>${lang.title}</h2>
                 <p>${lang.description}</p>
-                <a href="/privacy-policy/" class="privacy-policy-link">${lang.privacy}</a>
+                <a href="${config.privacyPolicyUrl}" class="main-privacy-policy-link">${lang.privacy}</a>
             </div>
-            <div class="cookie-consent-buttons">
-                <button id="acceptAllBtn" class="cookie-btn accept-btn">${lang.accept}</button>
-                <button id="adjustConsentBtn" class="cookie-btn adjust-btn">${lang.customize}</button>
-                <button id="rejectAllBtn" class="cookie-btn reject-btn">${lang.reject}</button>
+            <div class="all-cookie-consent-buttons">
+                <button id="acceptAllBtn" class="cookie-btn main-accept-button">${lang.accept}</button>
+                <button id="adjustConsentBtn" class="cookie-btn main-adjust-button">${lang.customize}</button>
+                <button id="rejectAllBtn" class="cookie-btn main-reject-btn">${lang.reject}</button>
+                
+                
             </div>
         </div>
     </div>
@@ -1562,17 +2104,27 @@ function injectConsentHTML(detectedCookies, language = 'en') {
                 ${detectedCookies.uncategorized.length > 0 ? generateCategorySection('uncategorized') : ''}
             </div>
             <div class="cookie-settings-footer">
-                <button id="rejectAllSettingsBtn" class="cookie-btn reject-btn">${lang.reject}</button>
-                <button id="saveSettingsBtn" class="cookie-btn save-btn">${lang.save}</button>
-                <button id="acceptAllSettingsBtn" class="cookie-btn accept-btn">${lang.accept}</button>
+                ${config.analytics.enabled ? `
+                <div class="see-analytics-container">
+                    <a href="#" class="see-analytics-link">${lang.seeAnalytics}</a>
+                </div>` : ''}
+                 <div class="modal-buttons-container">
+                    <button id="acceptAllSettingsBtn" class="cookie-btn main-accept-button">${lang.accept}</button>
+                    <button id="saveSettingsBtn" class="cookie-btn main-save-btn">${lang.save}</button>
+                    <button id="rejectAllSettingsBtn" class="cookie-btn main-reject-btn">${lang.reject}</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Floating Settings Button -->
+   <!-- Floating Settings Button -->
     <div id="cookieFloatingButton" class="cookie-settings-button" title="${lang.title}">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-            <path d="M257.5 27.6c-.8-5.4-4.9-9.8-10.3-10.6c-22.1-3.1-44.6 .9-64.4 11.4l-74 39.5C89.1 78.4 73.2 94.9 63.4 115L26.7 190.6c-9.8 20.1-13 42.9-9.1 64.9l14.5 82.8c3.9 22.1 14.6 42.3 30.7 57.9l60.3 58.4c16.1 15.6 36.6 25.6 58.7 28.7l83 11.7c22.1 3.1 44.6-.9-64.4-11.4l74-39.5c19.7-10.5 35.6-27 45.4-47.2l36.7-75.5c9.8-20.1 13-42.9 9.1-64.9c-.9-5.7-5.9-9.9-11.6-9.9c-51.5 0-101.5-14.7-144.9-42.3l-61.2-42.4c-10.1-7-21.8-11.1-33.9-11.9c-12.1-.9-24.1 1.6-34.9 7.2l-61.2 35.1c-6.4 3.7-14.6 1.9-19.3-4.1s-4.7-13.7 1.1-18.4l61.2-42.4c43.4-30.1 97.1-46.4 151.8-46.4c5.7 0 10.7-4.1 11.6-9.8zM133.4 303.6c-25.9 0-46.9-21-46.9-46.9s21-46.9 46.9-46.9s46.9 21 46.9 46.9s-21 46.9-46.9 46.9zm116.1-90.3c-26.5 0-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48s-21.5-48-48-48zm92.3 99.7c-26.5 0-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48s-21.5-48-48-48z"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="none">
+            <path d="M6 8H8.01V10H6V8Z" fill="currentColor"/>
+            <path d="M11 11H13.01V13H11V11Z" fill="currentColor"/>
+            <path d="M8 15H10.01V17H8V15Z" fill="currentColor"/>
+            <path d="M15 15H17.01V17H15V15Z" fill="currentColor"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M1 12C1 5.92487 5.92487 1 12 1C12.0366 1 12.0732 1.00018 12.1097 1.00054L13.3208 1.01239L13.08 2.19932C13.0276 2.45721 13 2.72486 13 3C13 4.95769 14.4074 6.58878 16.2659 6.93296L16.9419 7.05815L17.067 7.73414C17.4112 9.59261 19.0423 11 21 11C21.2751 11 21.5428 10.9724 21.8007 10.92L22.9876 10.6792L22.9995 11.8903C22.9998 11.9268 23 11.9634 23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12ZM11.0002 3.0549C6.50018 3.55223 3 7.36736 3 12C3 16.9706 7.02944 21 12 21C16.6326 21 20.4478 17.4998 20.9451 12.9998C18.2609 12.9757 15.9991 11.1899 15.2573 8.74272C12.8101 8.00085 11.0243 5.73912 11.0002 3.0549Z" fill="currentColor"/>
         </svg>
     </div>
     
@@ -1594,23 +2146,25 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     </div>
     
     <style>
-    /* Main Banner Styles - Updated to match image */
+    /* Main Banner Styles */
     .cookie-consent-banner {
         position: fixed;
         bottom: 20px;
-        ${config.behavior.floatingButtonPosition === 'left' ? 'left: 20px;' : 'right: 20px;'}
-        width: 440px;
-        background: ${currentTheme.background};
-        border-radius: 12px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        ${config.behavior.bannerPosition === 'left' ? 'left: 20px;' : 'right: 20px;'}
+        width: ${config.bannerStyle.width};
+        background: ${config.bannerStyle.background};
+        border-radius: ${config.bannerStyle.borderRadius};
+        box-shadow: ${config.bannerStyle.boxShadow};
         z-index: 9999;
-        padding: 24px;
+        padding: ${config.bannerStyle.padding};
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         display: none;
         transform: translateY(20px);
         opacity: 0;
-        transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-        border: none;
+        transition: all ${config.behavior.bannerAnimation.duration}s ${config.behavior.bannerAnimation.easing};
+        ${config.bannerStyle.border.enabled ? 
+            `border: ${config.bannerStyle.border.width} ${config.bannerStyle.border.style} ${config.bannerStyle.border.color};` : 
+            'border: none;'}
         overflow: hidden;
     }
 
@@ -1620,90 +2174,118 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         display: block;
     }
 
-    .cookie-consent-content h2 {
+    .main-cookie-consent-content h2 {
         margin: 0 0 16px 0;
-        font-size: 18px;
-        color: ${currentTheme.textDark};
-        font-weight: 600;
+        font-size: ${config.bannerStyle.title.fontSize};
+        color: ${config.bannerStyle.title.color};
+        font-weight: ${config.bannerStyle.title.fontWeight};
         line-height: 1.4;
         letter-spacing: -0.2px;
     }
 
-    .cookie-consent-content p {
-        margin: 0 0 24px 0;
-        font-size: 14px;
-        color: ${currentTheme.textLight};
-        line-height: 1.5;
+    .main-cookie-consent-content p {
+        margin: 0 0 10px 0;
+        font-size: ${config.bannerStyle.description.fontSize};
+        color: ${config.bannerStyle.description.color};
+        line-height: ${config.bannerStyle.description.lineHeight};
     }
 
-    .privacy-policy-link {
-        color: ${currentTheme.secondary};
+    .main-privacy-policy-link {
+        color: ${config.bannerStyle.linkColor};
         text-decoration: none;
         font-size: 13px;
         font-weight: 500;
         display: inline-block;
-        margin-bottom: 24px;
+        margin-bottom: 8px;
         transition: color 0.2s ease;
     }
 
-    .privacy-policy-link:hover {
-        color: #1d6fa5;
+    .main-privacy-policy-link:hover {
+        color: ${config.bannerStyle.linkHoverColor};
     }
 
-    .cookie-consent-buttons {
-        display: flex;
-        gap: 12px;
-        margin-top: 8px;
-    }
+.all-cookie-consent-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+}
 
     .cookie-btn {
-        padding: 12px 20px;
-        border-radius: 8px;
+        padding: ${config.buttonStyle.padding};
+        border-radius: ${config.buttonStyle.borderRadius};
         cursor: pointer;
-        font-weight: 600;
-        font-size: 14px;
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        font-weight: ${config.buttonStyle.fontWeight};
+        font-size: ${config.buttonStyle.fontSize};
+        transition: ${config.buttonStyle.transition};
         text-align: center;
         border: none;
         flex: 1;
         letter-spacing: 0.2px;
     }
 
-    .adjust-btn {
-        background-color: #f8f9fa;
-        color: #333;
-        border: 1px solid #e0e0e0;
+    .main-adjust-button {
+        background-color: ${config.buttonStyle.adjust.background};
+        color: ${config.buttonStyle.adjust.color};
+        border: ${config.buttonStyle.adjust.border};
     }
 
-    .adjust-btn:hover {
-        background-color: #f0f2f5;
-        transform: translateY(-1px);
+    .main-adjust-button:hover {
+        background-color: ${config.buttonStyle.adjust.hover.background};
+        color: ${config.buttonStyle.adjust.hover.color};
+        transform: ${config.buttonStyle.adjust.hover.transform};
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
 
-    .reject-btn {
-        background-color: #fff;
-        color: ${currentTheme.danger};
-        border: 1px solid ${currentTheme.danger};
+    .main-reject-btn {
+        background-color: ${config.buttonStyle.reject.background};
+        color: ${config.buttonStyle.reject.color};
+        border: ${config.buttonStyle.reject.border};
     }
 
-    .reject-btn:hover {
-        background-color: #ffeeed;
-        transform: translateY(-1px);
+    .main-reject-btn:hover {
+        background-color: ${config.buttonStyle.reject.hover.background};
+        color: ${config.buttonStyle.reject.hover.color};
+        transform: ${config.buttonStyle.reject.hover.transform};
         box-shadow: 0 2px 8px rgba(231, 76, 60, 0.15);
     }
 
-    .accept-btn {
-        background-color: ${currentTheme.primary};
-        color: white;
-        border: 1px solid ${currentTheme.primary};
-        box-shadow: 0 2px 12px rgba(46, 204, 113, 0.3);
+ .main-accept-button {
+    background-color: ${config.buttonStyle.accept.background};
+    color: ${config.buttonStyle.accept.color};
+    border: ${config.buttonStyle.accept.border};
+    box-shadow: 0 2px 12px rgba(46, 204, 113, 0.3);
+}
+
+.main-accept-button:hover {
+    background-color: ${config.buttonStyle.accept.hover.background};
+    color: ${config.buttonStyle.accept.hover.color};
+    transform: ${config.buttonStyle.accept.hover.transform};
+    box-shadow: 0 4px 16px rgba(46, 204, 113, 0.4);
+}
+
+    .main-save-btn {
+        background-color: ${config.buttonStyle.save.background};
+        color: ${config.buttonStyle.save.color};
+        border: ${config.buttonStyle.save.border};
     }
 
-    .accept-btn:hover {
-        background-color: #27ae60;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 16px rgba(46, 204, 113, 0.4);
+    .main-save-btn:hover {
+        background-color: ${config.buttonStyle.save.hover.background};
+        color: ${config.buttonStyle.save.hover.color};
+        transform: ${config.buttonStyle.save.hover.transform};
+        box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+    }
+
+    /* Modal Footer Buttons */
+    .modal-buttons-container {
+        display: flex;
+        gap: 12px;
+        margin-top: 15px;
+    }
+
+    .modal-buttons-container .cookie-btn {
+        flex: 1;
     }
 
     /* Language Selector Styles */
@@ -1725,17 +2307,17 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .language-selector select:hover {
-        border-color: ${currentTheme.secondary};
+        border-color: ${config.bannerStyle.linkColor};
         background-color: #fff;
     }
 
     .language-selector select:focus {
         outline: none;
-        border-color: ${currentTheme.secondary};
+        border-color: ${config.bannerStyle.linkColor};
         box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
     }
 
-    /* Settings Modal - Updated to 845x470 dimensions */
+    /* Settings Modal */
     .cookie-settings-modal {
         display: none;
         position: fixed;
@@ -1748,7 +2330,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         overflow-y: auto;
         padding: 30px 0;
         opacity: 0;
-        transition: opacity 0.3s ease;
+        transition: opacity ${config.behavior.modalAnimation.duration}s ${config.behavior.modalAnimation.easing};
     }
 
     .cookie-settings-modal.show {
@@ -1759,15 +2341,15 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .cookie-settings-content {
-        background-color: ${currentTheme.background};
+        background-color: ${config.modalStyle.background};
         margin: 0 auto;
-        width: 845px;
-        max-height: 470px;
-        border-radius: 12px;
+        width: ${config.modalStyle.width};
+        max-height: ${config.modalStyle.maxHeight};
+        border-radius: ${config.modalStyle.borderRadius};
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         overflow: hidden;
         transform: translateY(20px);
-        transition: transform 0.3s ease;
+        transition: transform ${config.behavior.modalAnimation.duration}s ${config.behavior.modalAnimation.easing};
         display: flex;
         flex-direction: column;
     }
@@ -1782,21 +2364,21 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background-color: #f8f9fa;
+        background-color: ${config.modalStyle.header.background};
     }
 
     .cookie-settings-header h2 {
         margin: 0;
-        color: ${currentTheme.textDark};
-        font-size: 1.5rem;
-        font-weight: 600;
+        color: ${config.modalStyle.header.textColor};
+        font-size: ${config.modalStyle.header.fontSize};
+        font-weight: ${config.modalStyle.header.fontWeight};
     }
 
     .close-modal {
         font-size: 28px;
         font-weight: bold;
         cursor: pointer;
-        color: ${currentTheme.textLight};
+        color: ${config.modalStyle.closeButton.color};
         background: none;
         border: none;
         padding: 0 10px;
@@ -1804,12 +2386,12 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .close-modal:hover {
-        color: ${currentTheme.danger};
+        color: ${config.modalStyle.closeButton.hoverColor};
     }
 
     .cookie-settings-body {
         padding: 25px 30px;
-        background-color: #fefefe;
+        background-color: ${config.modalStyle.body.background};
         overflow-y: auto;
         flex: 1;
     }
@@ -1822,10 +2404,11 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .cookie-category:hover {
-        background-color: #f8f9fa;
-        border-radius: 8px;
+        background-color: ${config.categoryStyle.background};
+        border-radius: ${config.categoryStyle.borderRadius};
         padding: 20px;
         margin-bottom: 20px;
+        border: ${config.categoryStyle.border};
     }
 
     .cookie-category:last-child {
@@ -1844,19 +2427,19 @@ function injectConsentHTML(detectedCookies, language = 'en') {
 
     .toggle-container h3 {
         margin: 0;
-        font-size: 1.1rem;
-        color: ${currentTheme.textDark};
-        font-weight: 600;
+        font-size: ${config.categoryStyle.title.fontSize};
+        color: ${config.categoryStyle.title.color};
+        font-weight: ${config.categoryStyle.title.fontWeight};
     }
 
-    .toggle-switch {
+    .main-toggle-switch {
         position: relative;
         display: inline-block;
-        width: 50px;
-        height: 26px;
+        width: ${config.toggleStyle.size};
+        height: ${config.toggleStyle.height};
     }
 
-    .toggle-switch input {
+    .main-toggle-switch input {
         opacity: 0;
         width: 0;
         height: 0;
@@ -1869,7 +2452,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         left: 0;
         right: 0;
         bottom: 0;
-        background-color: ${currentTheme.toggleInactive};
+        background-color: ${config.toggleStyle.inactiveColor};
         transition: .4s;
         border-radius: 34px;
     }
@@ -1877,8 +2460,8 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     .toggle-slider:before {
         position: absolute;
         content: "";
-        height: 20px;
-        width: 20px;
+        height: ${config.toggleStyle.sliderSize};
+        width: ${config.toggleStyle.sliderSize};
         left: 3px;
         bottom: 3px;
         background-color: white;
@@ -1888,7 +2471,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     input:checked + .toggle-slider {
-        background-color: ${currentTheme.toggleActive};
+        background-color: ${config.toggleStyle.activeColor};
     }
 
     input:checked + .toggle-slider:before {
@@ -1911,7 +2494,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
 
     .cookie-details-container:hover {
         box-shadow: 0 3px 12px rgba(0,0,0,0.1);
-        border-color: ${currentTheme.primary};
+        border-color: ${config.buttonStyle.accept.background};
     }
 
     .cookie-details-header {
@@ -1929,7 +2512,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         background-color: #eeeeee;
     }
 
-    .cookie-details-content {
+    .main-cookie-details-content {
         padding: 18px;
         background-color: #fafafa;
         border-top: 1px solid #e0e0e0;
@@ -1942,41 +2525,86 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         to { opacity: 1; transform: translateY(0); }
     }
 
-    .cookie-details-table {
+    .main-cookie-details-table {
         width: 100%;
         border-collapse: collapse;
         font-size: 13px;
     }
 
-    .cookie-details-table th {
+    .main-cookie-details-table th {
         text-align: left;
         padding: 10px 12px;
         background-color: #f0f0f0;
         font-weight: 600;
         border-bottom: 2px solid #e0e0e0;
-        color: ${currentTheme.textDark};
+        color: ${config.bannerStyle.title.color};
     }
 
-    .cookie-details-table td {
+    .main-cookie-details-table td {
         padding: 10px 12px;
         border-bottom: 1px solid #e0e0e0;
-        color: ${currentTheme.textLight};
+        color: ${config.bannerStyle.description.color};
     }
 
-    .cookie-details-table tr:last-child td {
+    .main-cookie-details-table tr:last-child td {
         border-bottom: none;
     }
 
-    .cookie-details-table tr:hover {
+    .main-cookie-details-table tr:hover {
         background-color: #f5f5f5;
     }
 
-    .cookie-details-table code {
+    .main-cookie-details-table code {
         background-color: #f0f0f0;
         padding: 2px 5px;
         border-radius: 3px;
         font-family: monospace;
-        color: ${currentTheme.textDark};
+        color: ${config.bannerStyle.title.color};
+    }
+
+    /* See Analytics Link */
+    .see-analytics-container {
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    .see-analytics-link {
+        color: ${config.bannerStyle.linkColor};
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        display: inline-block;
+        transition: color 0.2s ease;
+    }
+
+    .see-analytics-link:hover {
+        color: ${config.bannerStyle.linkHoverColor};
+        text-decoration: underline;
+    }
+
+    /* Mobile-friendly cookie value display */
+    .cookie-value-cell {
+        position: relative;
+    }
+
+    .cookie-value-full {
+        word-break: break-all;
+    }
+
+    .toggle-cookie-value {
+        background: none;
+        border: none;
+        color: ${config.bannerStyle.linkColor};
+        text-decoration: underline;
+        cursor: pointer;
+        font-size: 12px;
+        padding: 0;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .toggle-cookie-value:hover {
+        color: ${config.bannerStyle.linkHoverColor};
     }
 
     .no-cookies-message {
@@ -1991,20 +2619,20 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         position: fixed;
         bottom: 30px;
         ${config.behavior.floatingButtonPosition === 'left' ? 'left: 30px;' : 'right: 30px;'}
-        width: 60px;
-        height: 60px;
-        background-color: ${currentTheme.primary};
-        border-radius: 50%;
+        width: ${config.floatingButtonStyle.size};
+        height: ${config.floatingButtonStyle.size};
+        background-color: ${config.floatingButtonStyle.background};
+        border-radius: ${config.floatingButtonStyle.borderRadius};
         display: none;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        box-shadow: ${config.floatingButtonStyle.boxShadow};
         z-index: 9998;
         transition: all 0.3s ease;
         opacity: 0;
         transform: translateY(20px);
-        border: 2px solid white;
+        border: ${config.floatingButtonStyle.border};
     }
 
     .cookie-settings-button.show {
@@ -2013,18 +2641,20 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .cookie-settings-button:hover {
-        background-color: #27ae60;
-        transform: translateY(-3px) scale(1.05);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        background-color: ${config.floatingButtonStyle.hover.background};
+        transform: ${config.floatingButtonStyle.hover.transform};
+        box-shadow: ${config.floatingButtonStyle.hover.boxShadow};
     }
 
-    .cookie-settings-button svg {
-        width: 28px;
-        height: 28px;
-        fill: white;
+    #cookieFloatingButton.cookie-settings-button svg,
+    #cookieFloatingButton.cookie-settings-button svg path {
+        width: 40px;
+        height: 40px;
+        fill: ${config.floatingButtonStyle.iconColor} !important;
+        stroke: none;
         transition: transform 0.3s ease;
+        margin-top: 0px; 
     }
-
     .cookie-settings-button:hover svg {
         transform: rotate(15deg);
     }
@@ -2032,23 +2662,23 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     /* Admin Button */
     .cookie-admin-button {
         position: fixed;
-        ${config.behavior.floatingButtonPosition === 'left' ? 
+        ${config.behavior.adminButtonPosition === 'left' ? 
           'left: 30px; bottom: 100px;' : 
           'right: 30px; bottom: 100px;'}
-        width: 60px;
-        height: 60px;
-        background-color: ${currentTheme.secondary};
-        border-radius: 50%;
+        width: ${config.adminButtonStyle.size};
+        height: ${config.adminButtonStyle.size};
+        background-color: ${config.adminButtonStyle.background};
+        border-radius: ${config.adminButtonStyle.borderRadius};
         display: none;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        box-shadow: ${config.adminButtonStyle.boxShadow};
         z-index: 9997;
         transition: all 0.3s ease;
         opacity: 0;
         transform: translateY(20px);
-        border: 2px solid white;
+        border: ${config.adminButtonStyle.border};
     }
 
     .cookie-admin-button.show {
@@ -2057,15 +2687,15 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .cookie-admin-button:hover {
-        background-color: #2980b9;
-        transform: translateY(-3px) scale(1.05);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        background-color: ${config.adminButtonStyle.hover.background};
+        transform: ${config.adminButtonStyle.hover.transform};
+        box-shadow: ${config.adminButtonStyle.hover.boxShadow};
     }
 
     .cookie-admin-button svg {
         width: 28px;
         height: 28px;
-        fill: white;
+        fill: ${config.adminButtonStyle.iconColor};
         transition: transform 0.3s ease;
     }
 
@@ -2086,7 +2716,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         overflow-y: auto;
         padding: 30px 0;
         opacity: 0;
-        transition: opacity 0.3s ease;
+        transition: opacity ${config.behavior.dashboardAnimation.duration}s ${config.behavior.dashboardAnimation.easing};
     }
 
     .cookie-analytics-modal.show {
@@ -2097,15 +2727,15 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .cookie-analytics-content {
-        background-color: ${currentTheme.background};
+        background-color: ${config.dashboardStyle.background};
         margin: 0 auto;
-        width: 900px;
-        max-height: 600px;
-        border-radius: 12px;
+        width: ${config.dashboardStyle.width};
+        max-height: ${config.dashboardStyle.maxHeight};
+        border-radius: ${config.dashboardStyle.borderRadius};
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         overflow: hidden;
         transform: translateY(20px);
-        transition: transform 0.3s ease;
+        transition: transform ${config.behavior.dashboardAnimation.duration}s ${config.behavior.dashboardAnimation.easing};
         display: flex;
         flex-direction: column;
     }
@@ -2120,21 +2750,21 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background-color: #f8f9fa;
+        background-color: ${config.dashboardStyle.header.background};
     }
 
     .cookie-analytics-header h2 {
         margin: 0;
-        color: ${currentTheme.textDark};
-        font-size: 1.5rem;
-        font-weight: 600;
+        color: ${config.dashboardStyle.header.textColor};
+        font-size: ${config.dashboardStyle.header.fontSize};
+        font-weight: ${config.dashboardStyle.header.fontWeight};
     }
 
     .close-analytics-modal {
         font-size: 28px;
         font-weight: bold;
         cursor: pointer;
-        color: ${currentTheme.textLight};
+        color: ${config.modalStyle.closeButton.color};
         background: none;
         border: none;
         padding: 0 10px;
@@ -2142,14 +2772,153 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .close-analytics-modal:hover {
-        color: ${currentTheme.danger};
+        color: ${config.modalStyle.closeButton.hoverColor};
     }
 
     .cookie-analytics-body {
         padding: 25px 30px;
-        background-color: #fefefe;
+        background-color: ${config.dashboardStyle.body.background};
         overflow-y: auto;
         flex: 1;
+    }
+
+    /* Stats Dashboard */
+    .analytics-dashboard {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .analytics-dashboard h3 {
+        color: ${config.bannerStyle.title.color};
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: 1.3rem;
+    }
+
+    .stats-summary {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background-color: ${config.dashboardStyle.statCards.background};
+                border-radius: ${config.dashboardStyle.statCards.borderRadius};
+        padding: 15px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .stat-card.accepted {
+        border-top: 4px solid ${config.dashboardStyle.statCards.acceptedColor};
+    }
+
+    .stat-card.rejected {
+        border-top: 4px solid ${config.dashboardStyle.statCards.rejectedColor};
+    }
+
+    .stat-card.custom {
+        border-top: 4px solid ${config.dashboardStyle.statCards.customColor};
+    }
+
+    .stat-card.total {
+        border-top: 4px solid ${config.dashboardStyle.statCards.totalColor};
+    }
+
+    .stat-card h4 {
+        margin: 0 0 10px 0;
+        font-size: 1rem;
+        color: ${config.bannerStyle.description.color};
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: ${config.bannerStyle.title.color};
+        margin-bottom: 5px;
+    }
+
+    .stat-percentage {
+        font-size: 1rem;
+        color: ${config.bannerStyle.description.color};
+    }
+
+    .time-based-stats {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .time-stat {
+        background-color: ${config.dashboardStyle.statCards.background};
+        border-radius: ${config.dashboardStyle.statCards.borderRadius};
+        padding: 20px;
+    }
+
+    .time-stat h4 {
+        margin: 0 0 15px 0;
+        font-size: 1.1rem;
+        color: ${config.bannerStyle.title.color};
+    }
+
+    .stat-bars {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .stat-bar-container {
+        margin-bottom: 15px;
+    }
+
+    .stat-bar-label {
+        font-size: 0.85rem;
+        color: ${config.bannerStyle.description.color};
+        margin-bottom: 5px;
+    }
+
+    .stat-bar {
+        height: ${config.dashboardStyle.barChart.height};
+        background-color: ${config.dashboardStyle.barChart.background};
+        border-radius: ${config.dashboardStyle.barChart.borderRadius};
+        overflow: hidden;
+        display: flex;
+    }
+
+    .stat-bar-segment {
+        height: 100%;
+    }
+
+    .stat-bar-segment.accepted {
+        background-color: ${config.dashboardStyle.barChart.acceptedColor};
+    }
+
+    .stat-bar-segment.rejected {
+        background-color: ${config.dashboardStyle.barChart.rejectedColor};
+    }
+
+    .stat-bar-segment.custom {
+        background-color: ${config.dashboardStyle.barChart.customColor};
+    }
+
+    .stat-bar-legend {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: ${config.bannerStyle.description.color};
+        margin-top: 5px;
+    }
+
+    /* Footer Buttons */
+    .cookie-settings-footer {
+        padding: 20px 30px;
+        background-color: ${config.modalStyle.footer.background};
+        border-top: ${config.modalStyle.footer.borderTop};
     }
 
     /* Password Prompt */
@@ -2159,7 +2928,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .password-prompt h3 {
-        color: ${currentTheme.textDark};
+        color: ${config.bannerStyle.title.color};
         margin-bottom: 20px;
     }
 
@@ -2175,7 +2944,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
 
     .password-prompt button {
         padding: 12px 25px;
-        background-color: ${currentTheme.primary};
+        background-color: ${config.buttonStyle.accept.background};
         color: white;
         border: none;
         border-radius: 6px;
@@ -2185,167 +2954,13 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
     .password-prompt button:hover {
-        background-color: #27ae60;
+        background-color: ${config.buttonStyle.accept.hover.background};
     }
 
     .error-message {
-        color: ${currentTheme.danger};
+        color: ${config.buttonStyle.reject.color};
         margin-top: 10px;
         font-size: 14px;
-    }
-
-    /* Stats Dashboard */
-    .analytics-dashboard {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-
-    .analytics-dashboard h3 {
-        color: ${currentTheme.textDark};
-        margin-top: 0;
-        margin-bottom: 20px;
-        font-size: 1.3rem;
-    }
-
-    .stats-summary {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 15px;
-        margin-bottom: 30px;
-    }
-
-    .stat-card {
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        padding: 15px;
-        text-align: center;
-        transition: all 0.3s ease;
-    }
-
-    .stat-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-
-    .stat-card.accepted {
-        border-top: 4px solid ${currentTheme.primary};
-    }
-
-    .stat-card.rejected {
-        border-top: 4px solid ${currentTheme.danger};
-    }
-
-    .stat-card.custom {
-        border-top: 4px solid ${currentTheme.secondary};
-    }
-
-    .stat-card.total {
-        border-top: 4px solid #9b59b6;
-    }
-
-    .stat-card h4 {
-        margin: 0 0 10px 0;
-        font-size: 1rem;
-        color: ${currentTheme.textLight};
-    }
-
-    .stat-value {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: ${currentTheme.textDark};
-        margin-bottom: 5px;
-    }
-
-    .stat-percentage {
-        font-size: 1rem;
-        color: ${currentTheme.textLight};
-    }
-
-    .time-based-stats {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 30px;
-    }
-
-    .time-stat {
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        padding: 20px;
-    }
-
-    .time-stat h4 {
-        margin: 0 0 15px 0;
-        font-size: 1.1rem;
-        color: ${currentTheme.textDark};
-    }
-
-    .stat-bars {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-
-    .stat-bar-container {
-        margin-bottom: 15px;
-    }
-
-    .stat-bar-label {
-        font-size: 0.85rem;
-        color: ${currentTheme.textLight};
-        margin-bottom: 5px;
-    }
-
-    .stat-bar {
-        height: 20px;
-        background-color: #ecf0f1;
-        border-radius: 10px;
-        overflow: hidden;
-        display: flex;
-    }
-
-    .stat-bar-segment {
-        height: 100%;
-    }
-
-    .stat-bar-segment.accepted {
-        background-color: ${currentTheme.primary};
-    }
-
-    .stat-bar-segment.rejected {
-        background-color: ${currentTheme.danger};
-    }
-
-    .stat-bar-segment.custom {
-        background-color: ${currentTheme.secondary};
-    }
-
-    .stat-bar-legend {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.75rem;
-        color: ${currentTheme.textLight};
-        margin-top: 5px;
-    }
-
-    /* Footer Buttons */
-    .cookie-settings-footer {
-        padding: 20px 30px;
-        background-color: #f8f9fa;
-        display: flex;
-        justify-content: flex-end;
-        gap: 15px;
-        border-top: 1px solid #ecf0f1;
-    }
-
-    .save-btn {
-        background-color: ${currentTheme.secondary};
-        color: white;
-        background-image: linear-gradient(to right, ${currentTheme.secondary}, #2980b9);
-    }
-
-    .save-btn:hover {
-        background-color: #2980b9;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 10px rgba(0,0,0,0.15);
     }
 
     /* Responsive Styles */
@@ -2364,22 +2979,26 @@ function injectConsentHTML(detectedCookies, language = 'en') {
             grid-template-columns: repeat(2, 1fr);
         }
     }
-
+@media (min-width: 768px) {
+    .all-cookie-consent-buttons {
+        flex-direction: row;
+    }
+    .cookie-btn {
+        flex: 1;
+    }
+}
     @media (max-width: 768px) {
         .cookie-consent-banner {
             width: 90%;
-            ${config.behavior.floatingButtonPosition === 'left' ? 'left: 5%;' : 'right: 5%;'}
+            ${config.behavior.bannerPosition === 'left' ? 'left: 5%;' : 'right: 5%;'}
             bottom: 10px;
             padding: 20px;
-        }
-        
-        .cookie-consent-buttons {
             flex-direction: column;
         }
         
         .cookie-btn {
-            width: 100%;
-            margin-bottom: 8px;
+            flex: 1;
+            min-width: 120px;
         }
         
         .cookie-btn:last-child {
@@ -2395,41 +3014,60 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         }
         
         .cookie-settings-footer {
-            flex-direction: column;
             padding: 15px 20px;
         }
         
-        .cookie-settings-footer .cookie-btn {
+        .modal-buttons-container {
+            flex-direction: column;
+        }
+        
+        .modal-buttons-container .cookie-btn {
             width: 100%;
             margin-bottom: 8px;
         }
         
-        .cookie-settings-footer .cookie-btn:last-child {
+        .modal-buttons-container .cookie-btn:last-child {
             margin-bottom: 0;
         }
         
         .stats-summary {
             grid-template-columns: 1fr;
         }
+        
+        /* Mobile cookie details */
+        .main-cookie-details-table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        
+        .main-cookie-details-table td {
+            white-space: normal;
+        }
+        
+        .cookie-value-cell {
+            min-width: 120px;
+        }
     }
 
     @media (max-width: 480px) {
         .cookie-consent-banner {
             padding: 15px;
+            flex-direction: column;
             width: calc(100% - 30px);
-            ${config.behavior.floatingButtonPosition === 'left' ? 'left: 15px;' : 'right: 15px;'}
+            ${config.behavior.bannerPosition === 'left' ? 'left: 15px;' : 'right: 15px;'}
         }
         
-        .cookie-consent-content h2 {
+        .main-cookie-consent-content h2 {
             font-size: 1.1rem;
         }
         
-        .cookie-consent-content p {
+        .main-cookie-consent-content p {
             font-size: 0.85rem;
             margin-bottom: 15px;
         }
         
-        .privacy-policy-link {
+        .main-privacy-policy-link {
             margin-bottom: 15px;
         }
         
@@ -2448,7 +3086,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         .cookie-admin-button {
             width: 50px;
             height: 50px;
-            ${config.behavior.floatingButtonPosition === 'left' ? 
+            ${config.behavior.adminButtonPosition === 'left' ? 
               'left: 15px; bottom: 80px;' : 
               'right: 15px; bottom: 80px;'}
         }
@@ -2471,12 +3109,12 @@ function injectConsentHTML(detectedCookies, language = 'en') {
             font-size: 1rem;
         }
         
-        .cookie-details-table {
+        .main-cookie-details-table {
             font-size: 0.8rem;
         }
         
-        .cookie-details-table th, 
-        .cookie-details-table td {
+        .main-cookie-details-table th, 
+        .main-cookie-details-table td {
             padding: 8px 10px;
         }
     }
@@ -2485,16 +3123,103 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     document.body.insertAdjacentHTML('beforeend', html);
 }
 
+// Check if banner should be shown based on schedule
+function shouldShowBanner() {
+    if (!config.behavior.bannerSchedule.enabled) {
+        return true;
+    }
+
+    const now = new Date();
+    const currentDate = now.toISOString().split('T')[0];
+    const currentTime = now.getHours() * 100 + now.getMinutes();
+    const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+
+    // Check if we're using duration-based settings
+    if (config.behavior.bannerSchedule.durationDays) {
+        const firstVisit = getCookie('first_visit_date');
+        if (!firstVisit) {
+            setCookie('first_visit_date', currentDate, config.behavior.bannerSchedule.durationDays);
+            return true;
+        }
+        
+        const firstVisitDate = new Date(firstVisit);
+        const endDate = new Date(firstVisitDate);
+        endDate.setDate(endDate.getDate() + config.behavior.bannerSchedule.durationDays);
+        
+        return now <= endDate;
+    }
+
+    if (config.behavior.bannerSchedule.durationMinutes) {
+        const sessionStart = getCookie('session_start_time');
+        if (!sessionStart) {
+            setCookie('session_start_time', now.getTime().toString(), 0.5); // Expires in 30 minutes
+            return true;
+        }
+        
+        const sessionStartTime = parseInt(sessionStart);
+        const endTime = sessionStartTime + (config.behavior.bannerSchedule.durationMinutes * 60 * 1000);
+        
+        return now.getTime() <= endTime;
+    }
+
+    // Check date range
+    const startDate = new Date(config.behavior.bannerSchedule.startDate);
+    const endDate = new Date(config.behavior.bannerSchedule.endDate);
+    
+    if (now < startDate || now > endDate) {
+        return false;
+    }
+
+    // Check time range
+    const startTime = parseInt(config.behavior.bannerSchedule.startTime.split(':')[0]) * 100 + 
+                      parseInt(config.behavior.bannerSchedule.startTime.split(':')[1]);
+    const endTime = parseInt(config.behavior.bannerSchedule.endTime.split(':')[0]) * 100 + 
+                    parseInt(config.behavior.bannerSchedule.endTime.split(':')[1]);
+
+    if (currentTime < startTime || currentTime > endTime) {
+        return false;
+    }
+
+    // Check days of week
+    if (config.behavior.bannerSchedule.daysOfWeek.length > 0 && 
+        !config.behavior.bannerSchedule.daysOfWeek.includes(currentDay)) {
+        return false;
+    }
+
+    return true;
+}
+
+// Main initialization function
 function initializeCookieConsent(detectedCookies, language) {
     const consentGiven = getCookie('cookie_consent');
     
-    if (!consentGiven && config.behavior.autoShow) {
-        showCookieBanner();
+    // Check if banner should be shown based on geo-targeting and schedule
+    const geoAllowed = checkGeoTargeting(locationData);
+    const bannerShouldBeShown = geoAllowed && shouldShowBanner();
+    
+    if (!consentGiven && config.behavior.autoShow && bannerShouldBeShown) {
+        setTimeout(() => {
+            showCookieBanner();
+        }, config.behavior.bannerDelay * 1000);
     } else if (consentGiven) {
         const consentData = JSON.parse(consentGiven);
         updateConsentMode(consentData);
         loadCookiesAccordingToConsent(consentData);
-        showFloatingButton();
+        if (config.behavior.showFloatingButton) {
+            showFloatingButton();
+        }
+    }
+    // Explicitly apply the default language from config
+    changeLanguage(config.languageConfig.defaultLanguage);
+    
+    // Set the dropdown to the default language
+    const languageSelect = document.getElementById('cookieLanguageSelect');
+    if (languageSelect) {
+        languageSelect.value = config.languageConfig.defaultLanguage;
+        // Ensure the change event listener is correctly set up
+        languageSelect.addEventListener('change', function() {
+            changeLanguage(this.value);
+        });
     }
     
     // Set up event listeners
@@ -2515,16 +3240,29 @@ function initializeCookieConsent(detectedCookies, language) {
         });
     });
     
-    // Setup language selector change event
-    const languageSelect = document.getElementById('cookieLanguageSelect');
-    if (languageSelect) {
-        languageSelect.addEventListener('change', function() {
-            changeLanguage(this.value);
-        });
-    }
+    // Setup cookie value toggles for mobile
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('toggle-cookie-value')) {
+            const cell = e.target.closest('.cookie-value-cell');
+            const full = cell.querySelector('.cookie-value-full');
+            const truncated = cell.querySelector('.cookie-value-truncated');
+            
+            if (e.target.dataset.state === 'truncated') {
+                full.style.display = 'inline';
+                truncated.style.display = 'none';
+                e.target.textContent = 'Hide full';
+                e.target.dataset.state = 'full';
+            } else {
+                full.style.display = 'none';
+                truncated.style.display = 'inline';
+                e.target.textContent = 'Show full';
+                e.target.dataset.state = 'truncated';
+            }
+        }
+    });
     
     // Setup admin button if enabled
-    if (config.analytics.enabled && config.analytics.showDashboard) {
+    if (config.analytics.enabled && config.analytics.showDashboard && config.behavior.showAdminButton) {
         const adminButton = document.getElementById('cookieAdminButton');
         if (adminButton) {
             adminButton.addEventListener('click', showAnalyticsDashboard);
@@ -2539,22 +3277,46 @@ function initializeCookieConsent(detectedCookies, language) {
     if (config.analytics.passwordProtect && !isDashboardAuthenticated) {
         setupPasswordPromptEvents();
     }
+    
+    // Setup "See Consent Analytics" link in the modal footer
+    const seeAnalyticsLink = document.querySelector('.see-analytics-link');
+    if (seeAnalyticsLink) {
+        seeAnalyticsLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showAnalyticsDashboard();
+        });
+    }
+    
+    // Setup timer for durationMinutes if enabled
+    if (config.behavior.bannerSchedule.enabled && config.behavior.bannerSchedule.durationMinutes) {
+        // Clear any existing timer
+        if (bannerTimer) {
+            clearTimeout(bannerTimer);
+        }
+        
+        bannerTimer = setTimeout(() => {
+            if (!getCookie('cookie_consent')) {
+                hideCookieBanner();
+            }
+        }, config.behavior.bannerSchedule.durationMinutes * 60 * 1000);
+    }
 }
 
+// Setup password prompt events
 function setupPasswordPromptEvents() {
     const passwordSubmit = document.getElementById('dashboardPasswordSubmit');
     if (passwordSubmit) {
         passwordSubmit.addEventListener('click', function() {
             const passwordInput = document.getElementById('dashboardPasswordInput');
             const errorMessage = document.getElementById('passwordError');
+            const lang = document.getElementById('cookieLanguageSelect') ? 
+                document.getElementById('cookieLanguageSelect').value : 'en';
             
             if (passwordInput.value === config.analytics.dashboardPassword) {
                 isDashboardAuthenticated = true;
                 setCookie('dashboard_auth', 'true', config.analytics.passwordCookieDuration);
                 
                 // Update the dashboard content
-                const lang = document.getElementById('cookieLanguageSelect') ? 
-                    document.getElementById('cookieLanguageSelect').value : 'en';
                 document.querySelector('.cookie-analytics-body').innerHTML = generateAnalyticsDashboard(lang);
             } else {
                 errorMessage.textContent = translations[lang].passwordIncorrect;
@@ -2563,17 +3325,22 @@ function setupPasswordPromptEvents() {
     }
 }
 
+// Setup all event listeners
 function setupEventListeners() {
     document.getElementById('acceptAllBtn').addEventListener('click', function() {
         acceptAllCookies();
         hideCookieBanner();
-        showFloatingButton();
+        if (config.behavior.showFloatingButton) {
+            showFloatingButton();
+        }
     });
     
     document.getElementById('rejectAllBtn').addEventListener('click', function() {
         rejectAllCookies();
         hideCookieBanner();
-        showFloatingButton();
+        if (config.behavior.showFloatingButton) {
+            showFloatingButton();
+        }
     });
     
     document.getElementById('adjustConsentBtn').addEventListener('click', function() {
@@ -2584,19 +3351,25 @@ function setupEventListeners() {
     document.getElementById('acceptAllSettingsBtn').addEventListener('click', function() {
         acceptAllCookies();
         hideCookieSettings();
-        showFloatingButton();
+        if (config.behavior.showFloatingButton) {
+            showFloatingButton();
+        }
     });
     
     document.getElementById('rejectAllSettingsBtn').addEventListener('click', function() {
         rejectAllCookies();
         hideCookieSettings();
-        showFloatingButton();
+        if (config.behavior.showFloatingButton) {
+            showFloatingButton();
+        }
     });
     
     document.getElementById('saveSettingsBtn').addEventListener('click', function() {
         saveCustomSettings();
         hideCookieSettings();
-        showFloatingButton();
+        if (config.behavior.showFloatingButton) {
+            showFloatingButton();
+        }
     });
     
     document.querySelector('.close-modal').addEventListener('click', function() {
@@ -2619,69 +3392,14 @@ function setupEventListeners() {
     });
 }
 
-function updateCookieTables(detectedCookies) {
-    const categories = ['functional', 'analytics', 'performance', 'advertising', 'uncategorized'];
-    
-    categories.forEach(category => {
-        const container = document.querySelector(`input[data-category="${category}"]`)?.closest('.cookie-category');
-        if (container) {
-            const content = container.querySelector('.cookie-details-content');
-            if (content) {
-                content.innerHTML = detectedCookies[category].length > 0 ? 
-                    generateCookieTable(detectedCookies[category]) : 
-                    '<p class="no-cookies-message">No cookies in this category detected.</p>';
-            }
-        }
-    });
-}
-
-function generateCookieTable(cookies) {
-    return `
-    <table class="cookie-details-table">
-        <thead>
-            <tr>
-                <th>Cookie Name</th>
-                <th>Value</th>
-                <th>Duration</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-            ${cookies.map(cookie => `
-            <tr>
-                <td><code>${cookie.name}</code></td>
-                <td><code>${cookie.value.substring(0, 20)}${cookie.value.length > 20 ? '...' : ''}</code></td>
-                <td>${cookie.duration}</td>
-                <td>${cookie.description}</td>
-            </tr>`).join('')}
-        </tbody>
-    </table>`;
-}
-
-function showFloatingButton() {
-    if (!config.behavior.floatingButton) return;
-    
-    const button = document.getElementById('cookieFloatingButton');
-    button.style.display = 'flex';
-    setTimeout(() => {
-        button.classList.add('show');
-    }, 100);
-}
-
-function hideFloatingButton() {
-    const button = document.getElementById('cookieFloatingButton');
-    button.classList.remove('show');
-    setTimeout(() => {
-        button.style.display = 'none';
-    }, 300);
-}
-
+// Show/hide functions with animations
 function showCookieBanner() {
     const banner = document.getElementById('cookieConsentBanner');
     banner.style.display = 'block';
     setTimeout(() => {
         banner.classList.add('show');
     }, 10);
+    bannerShown = true;
 }
 
 function hideCookieBanner() {
@@ -2690,6 +3408,7 @@ function hideCookieBanner() {
     setTimeout(() => {
         banner.style.display = 'none';
     }, 400);
+    bannerShown = false;
 }
 
 function showCookieSettings() {
@@ -2710,18 +3429,17 @@ function hideCookieSettings() {
 }
 
 function showAnalyticsDashboard() {
+    const lang = document.getElementById('cookieLanguageSelect') ? 
+        document.getElementById('cookieLanguageSelect').value : 'en';
+    
     if (config.analytics.passwordProtect && !isDashboardAuthenticated) {
-        // Show password prompt if not authenticated
         const modal = document.getElementById('cookieAnalyticsModal');
         modal.style.display = 'flex';
         setTimeout(() => {
             modal.classList.add('show');
         }, 10);
     } else {
-        // Show dashboard if authenticated or no password protection
         const modal = document.getElementById('cookieAnalyticsModal');
-        const lang = document.getElementById('cookieLanguageSelect') ? 
-            document.getElementById('cookieLanguageSelect').value : 'en';
         document.querySelector('.cookie-analytics-body').innerHTML = generateAnalyticsDashboard(lang);
         modal.style.display = 'flex';
         setTimeout(() => {
@@ -2738,57 +3456,27 @@ function hideAnalyticsDashboard() {
     }, 300);
 }
 
-function updateConsentMode(consentData) {
-    const consentStates = {
-        'ad_storage': consentData.categories.advertising ? 'granted' : 'denied',
-        'analytics_storage': consentData.categories.analytics ? 'granted' : 'denied',
-        'ad_user_data': consentData.categories.advertising ? 'granted' : 'denied',
-        'ad_personalization': consentData.categories.advertising ? 'granted' : 'denied',
-        'personalization_storage': consentData.categories.performance ? 'granted' : 'denied',
-        'functionality_storage': consentData.categories.functional ? 'granted' : 'denied',
-        'security_storage': 'granted'
-    };
-
-    // Determine GCS signal
-    let gcsSignal = 'G100'; // Default to denied
-    
-    if (consentData.status === 'accepted') {
-        gcsSignal = 'G111';
-    } else if (consentData.status === 'custom') {
-        gcsSignal = 'G101';
-    }
-
-    // Update consent mode immediately
-    gtag('consent', 'update', consentStates);
-    
-    // Push detailed consent data to dataLayer
-    window.dataLayer.push({
-        'event': 'cookie_consent_update',
-        'consent_mode': consentStates,
-        'gcs': gcsSignal,
-        'consent_status': consentData.status,
-        'consent_categories': consentData.categories,
-        'timestamp': new Date().toISOString(),
-        'consent_version': '4.0',
-        'consent_scope': 'global',
-        'debug_info': {
-            'cookies_found': scanAndCategorizeCookies(),
-            'user_agent': navigator.userAgent,
-            'language': navigator.language
-        }
-    });
-
-    console.log('Consent Mode Updated:', {
-        states: consentStates,
-        gcsSignal: gcsSignal,
-        categories: consentData.categories
-    });
+function showFloatingButton() {
+    const button = document.getElementById('cookieFloatingButton');
+    button.style.display = 'flex';
+    setTimeout(() => {
+        button.classList.add('show');
+    }, 100);
 }
 
+function hideFloatingButton() {
+    const button = document.getElementById('cookieFloatingButton');
+    button.classList.remove('show');
+    setTimeout(() => {
+        button.style.display = 'none';
+    }, 300);
+}
+
+// Cookie consent functions
 function acceptAllCookies() {
     const consentData = {
         status: 'accepted',
-        gcs: 'G111',
+        gcs: 'G111', // Explicit GCS signal for all granted
         categories: {
             functional: true,
             analytics: true,
@@ -2803,18 +3491,36 @@ function acceptAllCookies() {
     updateConsentMode(consentData);
     loadCookiesAccordingToConsent(consentData);
     
-    // Update analytics
     if (config.analytics.enabled) {
         updateConsentStats('accepted');
     }
+    
+    // Push dataLayer event for consent acceptance with location data and GCS
+    window.dataLayer.push({
+        'event': 'cookie_consent_accepted',
+        'consent_mode': {
+            'ad_storage': 'granted',
+            'analytics_storage': 'granted',
+            'ad_user_data': 'granted',
+            'ad_personalization': 'granted',
+            'personalization_storage': 'granted',
+            'functionality_storage': 'granted',
+            'security_storage': 'granted'
+        },
+        'gcs': 'G111', // Explicit GCS signal
+        'consent_status': 'accepted',
+        'consent_categories': consentData.categories,
+        'timestamp': new Date().toISOString(),
+        'location_data': locationData
+    });
 }
 
 function rejectAllCookies() {
     const consentData = {
         status: 'rejected',
-        gcs: 'G100',
+        gcs: 'G100', // Explicit GCS signal for all denied
         categories: {
-            functional: true,  // Essential cookies always enabled
+            functional: false,
             analytics: false,
             performance: false,
             advertising: false,
@@ -2827,43 +3533,53 @@ function rejectAllCookies() {
     updateConsentMode(consentData);
     clearNonEssentialCookies();
     
-    // Update analytics
     if (config.analytics.enabled) {
         updateConsentStats('rejected');
     }
-}
-
-function clearNonEssentialCookies() {
-    const cookies = document.cookie.split(';');
-    cookies.forEach(cookie => {
-        const [nameValue] = cookie.trim().split('=');
-        const name = nameValue.trim();
-        let isEssential = false;
-        
-        // Check if cookie is essential
-        for (const pattern in cookieDatabase) {
-            if (name.startsWith(pattern) && cookieDatabase[pattern].category === 'functional') {
-                isEssential = true;
-                break;
-            }
-        }
-        
-        if (!isEssential && name && name !== 'cookie_consent') {
-            // Clear the cookie
-            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${window.location.hostname}`;
-        }
+    
+    // Push dataLayer event for consent rejection with location data and GCS
+    window.dataLayer.push({
+        'event': 'cookie_consent_rejected',
+        'consent_mode': {
+            'ad_storage': 'denied',
+            'analytics_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'personalization_storage': 'denied',
+            'functionality_storage': 'denied',
+            'security_storage': 'granted'
+        },
+        'gcs': 'G100', // Explicit GCS signal
+        'consent_status': 'rejected',
+        'consent_categories': consentData.categories,
+        'timestamp': new Date().toISOString(),
+        'location_data': locationData
     });
 }
 
 function saveCustomSettings() {
+    const analyticsChecked = document.querySelector('input[data-category="analytics"]').checked;
+    const advertisingChecked = document.querySelector('input[data-category="advertising"]').checked;
+    
+    let gcsSignal;
+    if (analyticsChecked && advertisingChecked) {
+        gcsSignal = 'G111'; // Both granted
+    } else if (!analyticsChecked && !advertisingChecked) {
+        gcsSignal = 'G100'; // Both denied
+    } else if (analyticsChecked && !advertisingChecked) {
+        gcsSignal = 'G101'; // Analytics granted, ads denied
+    } else if (!analyticsChecked && advertisingChecked) {
+        gcsSignal = 'G110'; // Ads granted, analytics denied
+    }
+
     const consentData = {
         status: 'custom',
-        gcs: 'G101',
+        gcs: gcsSignal,
         categories: {
-            functional: true,  // Essential cookies always enabled
-            analytics: document.querySelector('input[data-category="analytics"]').checked,
+            functional: true,
+            analytics: analyticsChecked,
             performance: document.querySelector('input[data-category="performance"]').checked,
-            advertising: document.querySelector('input[data-category="advertising"]').checked,
+            advertising: advertisingChecked,
             uncategorized: document.querySelector('input[data-category="uncategorized"]') ? 
                 document.querySelector('input[data-category="uncategorized"]').checked : false
         },
@@ -2874,16 +3590,84 @@ function saveCustomSettings() {
     updateConsentMode(consentData);
     loadCookiesAccordingToConsent(consentData);
     
-    // Clear cookies if categories were disabled
     if (!consentData.categories.analytics) clearCategoryCookies('analytics');
     if (!consentData.categories.performance) clearCategoryCookies('performance');
     if (!consentData.categories.advertising) clearCategoryCookies('advertising');
     if (!consentData.categories.uncategorized) clearCategoryCookies('uncategorized');
     
-    // Update analytics
     if (config.analytics.enabled) {
         updateConsentStats('custom');
     }
+    
+    const consentStates = {
+        'ad_storage': consentData.categories.advertising ? 'granted' : 'denied',
+        'analytics_storage': consentData.categories.analytics ? 'granted' : 'denied',
+        'ad_user_data': consentData.categories.advertising ? 'granted' : 'denied',
+        'ad_personalization': consentData.categories.advertising ? 'granted' : 'denied',
+        'personalization_storage': consentData.categories.performance ? 'granted' : 'denied',
+        'functionality_storage': consentData.categories.functional ? 'granted' : 'denied',
+        'security_storage': 'granted'
+    };
+    
+    // Fire specific events based on consent choices with GCS signals
+    if (analyticsChecked && !advertisingChecked) {
+        window.dataLayer.push({
+            'event': 'analytics_cookie_accepted',
+            'consent_mode': {
+                'analytics_storage': 'granted',
+                'ad_storage': 'denied'
+            },
+            'gcs': 'G101', // Explicit GCS signal
+            'consent_status': 'custom',
+            'consent_categories': consentData.categories,
+            'timestamp': new Date().toISOString(),
+            'location_data': locationData
+        });
+    } else if (advertisingChecked && !analyticsChecked) {
+        window.dataLayer.push({
+            'event': 'marketing_cookie_accepted',
+            'consent_mode': {
+                'ad_storage': 'granted',
+                'analytics_storage': 'denied'
+            },
+            'gcs': 'G110', // Explicit GCS signal
+            'consent_status': 'custom',
+            'consent_categories': consentData.categories,
+            'timestamp': new Date().toISOString(),
+            'location_data': locationData
+        });
+    } else {
+        // For all other cases (both accepted or both rejected)
+        window.dataLayer.push({
+            'event': 'cookie_consent_custom',
+            'consent_mode': consentStates,
+            'gcs': gcsSignal, // Explicit GCS signal
+            'consent_status': 'custom',
+            'consent_categories': consentData.categories,
+            'timestamp': new Date().toISOString(),
+            'location_data': locationData
+        });
+    }
+}
+// Helper functions
+function clearNonEssentialCookies() {
+    const cookies = document.cookie.split(';');
+    cookies.forEach(cookie => {
+        const [nameValue] = cookie.trim().split('=');
+        const name = nameValue.trim();
+        let isEssential = false;
+        
+        for (const pattern in cookieDatabase) {
+            if (name.startsWith(pattern) && cookieDatabase[pattern].category === 'functional') {
+                isEssential = true;
+                break;
+            }
+        }
+        
+        if (!isEssential && name && name !== 'cookie_consent') {
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${window.location.hostname}`;
+        }
+    });
 }
 
 function clearCategoryCookies(category) {
@@ -2894,11 +3678,7 @@ function clearCategoryCookies(category) {
 }
 
 function loadCookiesAccordingToConsent(consentData) {
-    if (consentData.categories.analytics) {
-        loadAnalyticsCookies();
-    }
-    
-    if (consentData.categories.advertising) {
+   if (consentData.categories.advertising) {
         loadAdvertisingCookies();
     }
     
@@ -2907,37 +3687,75 @@ function loadCookiesAccordingToConsent(consentData) {
     }
 }
 
-function loadAnalyticsCookies() {
-    console.log('Loading analytics cookies');
-    // Implement your analytics tracking here
-    if (typeof ga === 'undefined' && typeof gtag === 'function') {
-        gtag('js', new Date());
-        gtag('config', 'YOUR_GA4_MEASUREMENT_ID');
+// Update consent mode for both Google and Microsoft UET
+function updateConsentMode(consentData) {
+    const consentStates = {
+        'ad_storage': consentData.categories.advertising ? 'granted' : 'denied',
+        'analytics_storage': consentData.categories.analytics ? 'granted' : 'denied',
+        'ad_user_data': consentData.categories.advertising ? 'granted' : 'denied',
+        'ad_personalization': consentData.categories.advertising ? 'granted' : 'denied',
+        'personalization_storage': consentData.categories.performance ? 'granted' : 'denied',
+        'functionality_storage': consentData.categories.functional ? 'granted' : 'denied',
+        'security_storage': 'granted'
+    };
+
+    // Determine GCS signal based on consent status and categories
+    let gcsSignal = 'G100'; // Default to all denied
+    
+    if (consentData.status === 'accepted') {
+        gcsSignal = 'G111'; // All granted
+    } else if (consentData.status === 'custom') {
+        if (consentData.categories.analytics && !consentData.categories.advertising) {
+            gcsSignal = 'G101'; // Analytics granted, ads denied
+        } else if (consentData.categories.advertising && !consentData.categories.analytics) {
+            gcsSignal = 'G110'; // Ads granted, analytics denied
+        } else if (consentData.categories.analytics && consentData.categories.advertising) {
+            gcsSignal = 'G111'; // Both granted (same as accept all)
+        } else {
+            gcsSignal = 'G100'; // Both denied (same as reject all)
+        }
     }
-}
 
-function loadAdvertisingCookies() {
-    console.log('Loading advertising cookies');
-    // Implement your advertising tracking here
-    if (typeof fbq === 'undefined') {
-        !function(f,b,e,v,n,t,s)
-        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-        n.queue=[];t=b.createElement(e);t.async=!0;
-        t.src=v;s=b.getElementsByTagName(e)[0];
-        s.parentNode.insertBefore(t,s)}(window, document,'script',
-        'https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', 'YOUR_PIXEL_ID');
-        fbq('track', 'PageView');
+    // Update Google consent with explicit GCS parameter
+    gtag('consent', 'update', {
+        ...consentStates,
+      
+    });
+    
+    // Update Microsoft UET consent if enabled
+    if (config.uetConfig.enabled) {
+        const uetConsentState = consentData.categories.advertising ? 'granted' : 'denied';
+        window.uetq.push('consent', 'update', {
+            'ad_storage': uetConsentState
+        });
+        
+        // Push UET consent event to dataLayer with the exact requested format
+        window.dataLayer.push({
+            'event': 'uet_consent_update',
+            'uet_consent': {
+                'ad_storage': uetConsentState,
+                'status': consentData.status,
+                'src': 'update',
+                'asc': uetConsentState === 'granted' ? 'G' : 'D',
+                'timestamp': new Date().toISOString()
+            },
+            'location_data': locationData
+        });
     }
+    
+    // Push general consent update to dataLayer with GCS signal
+    window.dataLayer.push({
+        'event': 'cookie_consent_update',
+        'consent_mode': consentStates,
+        'gcs': gcsSignal,
+        'consent_status': consentData.status,
+        'consent_categories': consentData.categories,
+        'timestamp': new Date().toISOString(),
+        'location_data': locationData
+    });
 }
 
-function loadPerformanceCookies() {
-    console.log('Loading performance cookies');
-    // Implement performance tracking here
-}
-
+// Cookie management functions
 function setCookie(name, value, days) {
     let expires = "";
     if (days) {
@@ -2958,4 +3776,114 @@ function getCookie(name) {
     }
     return null;
 }
+
+
+// Load analytics cookies function
+function loadAdvertisingCookies() {
+    console.log('Loading advertising cookies');
+    // This would typically load advertising scripts like Facebook Pixel, etc.
+    // Implementation depends on your specific advertising setup
+}
+
+// Load performance cookies function
+function loadPerformanceCookies() {
+    console.log('Loading performance cookies');
+    // This would typically load performance optimization scripts
+}
+
+// Main execution flow
+document.addEventListener('DOMContentLoaded', async function() {
+      // Ensure location data is loaded first
+    if (!sessionStorage.getItem('locationData')) {
+        await fetchLocationData();
+    }  
+   
+
+ // Check if domain is allowed
+    if (!isDomainAllowed()) {
+        console.log('Cookie consent banner not shown - domain not allowed');
+        return;
+    }
+
+    // Load analytics data from storage
+    if (config.analytics.enabled) {
+        loadAnalyticsData();
+    }
+
+    // Set default UET consent
+    setDefaultUetConsent();
+
+    // Fetch location data asynchronously
+    await fetchLocationData();
+    
+      // Check geo-targeting before proceeding
+    const geoAllowed = checkGeoTargeting(locationData);
+    if (!geoAllowed) {
+        console.log('Cookie consent banner not shown - geo-targeting restriction');
+        return;
+    }
+
+    // Scan and categorize existing cookies
+    const detectedCookies = scanAndCategorizeCookies();
+
+    // Detect user language
+    const userLanguage = detectUserLanguage(locationData);
+
+    // Inject HTML elements
+    injectConsentHTML(detectedCookies, userLanguage);
+
+    // Initialize cookie consent
+    initializeCookieConsent(detectedCookies, userLanguage);
+
+    // Handle scroll acceptance if enabled
+    if (config.behavior.acceptOnScroll) {
+        let scrollTimeout;
+        window.addEventListener('scroll', function() {
+            if (!getCookie('cookie_consent') && bannerShown) {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(function() {
+                    const scrollPercentage = (window.scrollY + window.innerHeight) / document.body.scrollHeight * 100;
+                    if (scrollPercentage > 30) {
+                        acceptAllCookies();
+                        hideCookieBanner();
+                        if (config.behavior.showFloatingButton) {
+                            showFloatingButton();
+                        }
+                    }
+                }, 200);
+            }
+        });
+    }
+
+    // Handle continue button acceptance if enabled
+    if (config.behavior.acceptOnContinue) {
+        document.addEventListener('click', function(e) {
+            if (!getCookie('cookie_consent') && bannerShown && 
+                !e.target.closest('#cookieConsentBanner') && 
+                !e.target.closest('#cookieSettingsModal')) {
+                acceptAllCookies();
+                hideCookieBanner();
+                if (config.behavior.showFloatingButton) {
+                    showFloatingButton();
+                }
+            }
+        });
+    }
+});
+
+// Export functions for global access if needed
+if (typeof window !== 'undefined') {
+    window.cookieConsent = {
+        showBanner: showCookieBanner,
+        hideBanner: hideCookieBanner,
+        showSettings: showCookieSettings,
+        acceptAll: acceptAllCookies,
+        rejectAll: rejectAllCookies,
+        saveSettings: saveCustomSettings,
+        changeLanguage: changeLanguage,
+        showAnalytics: showAnalyticsDashboard,
+        config: config
+    };
+}
+
 
