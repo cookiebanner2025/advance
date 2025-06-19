@@ -1,3 +1,10 @@
+/**
+you can change the cookie category description text by this class. like you can change the essential cookies description text size.
+  .broadcookiedes {
+      font-size: 15px;
+    } 
+ */
+
 const EU_COUNTRIES = [
   "AL", // Albania
   "AD", // Andorra
@@ -58,7 +65,19 @@ const config = {
     
     // Privacy policy URL (configurable)
     privacyPolicyUrl: 'https://yourdomain.com/privacy-policy', // Add your full privacy policy URL here
-    
+
+
+   
+    // Query Parameter Storage Configuration
+    queryParamsConfig: {
+        enabled: true, // Enable/disable query parameter storage
+        paramsToStore: ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'],
+        retentionDays: 30, // Default retention period (can be overridden)
+        maxLength: 100, // Maximum length for parameter values to prevent XSS
+        autoRestore: true, // Automatically restore params to new URLs
+        manualClear: true // Enable manual clearing function
+    },
+  
     // Microsoft UET Configuration
     // Microsoft UET Configuration
     uetConfig: {
@@ -73,7 +92,8 @@ const config = {
     // Behavior configuration
     behavior: {
         autoShow: true,
-        bannerDelay: 0,
+        bannerDelay: 0, // Desktop delay (seconds)
+        bannerDelayMobile: 0, // Mobile delay (seconds) - add this line
         rememberLanguage: true,
         acceptOnScroll: false,
         acceptOnContinue: false,
@@ -131,7 +151,7 @@ geoConfig: {
     blockedCountries: [], // Never show in these countries
     blockedRegions: [], // Never show in these regions
     blockedCities: [], // Never show in these cities
-    euOnly: true, // NEW: Set to true to only show in EU countries
+    euOnly: false, // NEW: Set to true to only show in EU countries
     specificRegions: [] // NEW: Can specify 'EU' or other regions
 },
     
@@ -188,23 +208,23 @@ geoConfig: {
         transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
         
        accept: {
-    background: '#2ecc71 !important',
+    background: '#1177d0 !important',
     color: '#ffffff !important',
-    border: '1px solid #2ecc71 !important',
+    border: '1px solid #1177d0 !important',
     hover: {
-        background: '#27ae60 !important',
+        background: '#1177d0 !important',
         color: '#ffffff !important',
         transform: 'translateY(-1px) !important'
     }
         },
         
         reject: {
-            background: '#ffffff',
-            color: '#e74c3c',
-            border: '1px solid #e74c3c',
+            background: '#f8f9fa',
+            color: '#333333',
+            border: '1px solid #e0e0e0',
             hover: {
-                background: '#ffeeed',
-                color: '#e74c3c',
+                background: '#f8f9fa',
+                color: '#333333',
                 transform: 'translateY(-1px)'
             }
         },
@@ -221,12 +241,12 @@ geoConfig: {
         },
         
         save: {
-            background: '#3498db',
-            color: '#ffffff',
-            border: '1px solid #3498db',
+            background: '#f8f9fa',
+            color: '#333333',
+            border: '1px solid #e0e0e0',
             hover: {
-                background: '#2980b9',
-                color: '#ffffff',
+                background: '#f8f9fa',
+                color: '#333333',
                 transform: 'translateY(-1px)'
             }
         }
@@ -235,13 +255,13 @@ geoConfig: {
     // Floating button styling
     floatingButtonStyle: {
         size: '50px',
-        background: '#2ecc71',
+        background: '#1177d0 ',
         iconColor: '#ffffff',
         border: '2px solid #ffffff',
         borderRadius: '50%',
         boxShadow: '0 6px 20px rgba(0, 0, 0, 0.2)',
         hover: {
-            background: '#27ae60',
+            background: '#1177d0',
             transform: 'translateY(-3px) scale(1.05)',
             boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)'
         }
@@ -446,101 +466,311 @@ function setDefaultUetConsent() {
 
 // Enhanced cookie database with detailed descriptions
 const cookieDatabase = {
-    // Existing cookies
+    // ========== ADVERTISING COOKIES ==========
+    // Google Advertising
     '_gcl': { category: 'advertising', duration: '90 days', description: 'Google Click Identifier - Tracks ad clicks and conversions' },
     '_gcl_au': { category: 'advertising', duration: '90 days', description: 'Google Ads conversion tracking' },
     'gclid': { category: 'advertising', duration: '30 days', description: 'Google Click ID - Tracks PPC ad clicks' },
     'IDE': { category: 'advertising', duration: '390 days', description: 'Google DoubleClick - Used for retargeting' },
     'NID': { category: 'advertising', duration: '180 days', description: 'Google Ads preferences' },
     '_gat_gtag': { category: 'advertising', duration: '1 minute', description: 'Google Tag Manager throttle' },
+    'DSID': { category: 'advertising', duration: '14 days', description: 'Google Display & Video 360 ID' },
+    'FPLC': { category: 'advertising', duration: '20 hours', description: 'Google Floodlight counter' },
+    
+    // Microsoft Advertising
     'msclkid': { category: 'advertising', duration: '30 days', description: 'Microsoft Click ID - Tracks ad clicks' },
     '_uetmsdns': { category: 'advertising', duration: 'Session', description: 'Microsoft UET consent mode cookie' },
     'MUID': { category: 'advertising', duration: '390 days', description: 'Microsoft Universal ID' },
     '_uetsid': { category: 'advertising', duration: '1 day', description: 'Bing Ads session ID' },
-  '_uetmsclkid': { 
-        category: 'advertising', 
-        duration: 'Session', 
-        description: 'Microsoft UET click ID - Tracks ad clicks for conversion' 
-    },
-  '_uetmsd': { 
-        category: 'advertising', 
-        duration: 'Session', 
-        description: 'Microsoft UET domain setting - Enables cross-domain tracking' 
-    },
-    'MUIDB': { 
-        category: 'advertising', 
-        duration: '390 days', 
-        description: 'Microsoft Universal ID backup - Fallback identifier' 
-    },
+    '_uetmsclkid': { category: 'advertising', duration: 'Session', description: 'Microsoft UET click ID' },
+    '_uetmsd': { category: 'advertising', duration: 'Session', description: 'Microsoft UET domain setting' },
+    'MUIDB': { category: 'advertising', duration: '390 days', description: 'Microsoft Universal ID backup' },
     '_uetvid': { category: 'advertising', duration: '390 days', description: 'Bing Ads visitor ID' },
+    '_uetsid_exp': { category: 'advertising', duration: '1 day', description: 'Bing Ads session expiration' },
+    
+    // Facebook/Meta Advertising
     '_fbp': { category: 'advertising', duration: '90 days', description: 'Facebook Pixel - Conversion tracking' },
     'fr': { category: 'advertising', duration: '90 days', description: 'Facebook browser ID' },
     'datr': { category: 'advertising', duration: '730 days', description: 'Facebook browser identification' },
+    'lu': { category: 'advertising', duration: '2 years', description: 'Facebook login status' },
+    'xs': { category: 'advertising', duration: '90 days', description: 'Facebook session ID' },
+    'c_user': { category: 'advertising', duration: '90 days', description: 'Facebook user ID' },
+    'm_user': { category: 'advertising', duration: '90 days', description: 'Facebook mobile user ID' },
+    'pl': { category: 'advertising', duration: '90 days', description: 'Facebook platform login' },
+    'dbln': { category: 'advertising', duration: '2 years', description: 'Facebook device-based login' },
+    '_fbc': { category: 'advertising', duration: '2 years', description: 'Facebook click ID' },
+    'usida': { category: 'advertising', duration: 'Session', description: 'Facebook targeted advertising' },
+    'act': { category: 'advertising', duration: 'Session', description: 'Facebook current session activity' },
+    
+    // TikTok Advertising
     '_ttp': { category: 'advertising', duration: '390 days', description: 'TikTok Pixel tracking' },
     'ttclid': { category: 'advertising', duration: '30 days', description: 'TikTok Click ID' },
     'tt_sessionid': { category: 'advertising', duration: '1 day', description: 'TikTok session' },
+    'tt_medium': { category: 'advertising', duration: '30 days', description: 'TikTok traffic source' },
+    'tt_campaign': { category: 'advertising', duration: '30 days', description: 'TikTok campaign ID' },
+    
+    // LinkedIn Advertising
     'lidc': { category: 'advertising', duration: '1 day', description: 'LinkedIn Ads routing' },
     'bcookie': { category: 'advertising', duration: '730 days', description: 'LinkedIn Browser ID' },
     'li_sugr': { category: 'advertising', duration: '90 days', description: 'LinkedIn user tracking' },
+    'bscookie': { category: 'advertising', duration: '730 days', description: 'LinkedIn secure browser ID' },
+    'UserMatchHistory': { category: 'advertising', duration: '30 days', description: 'LinkedIn Ads matching' },
+    'lang': { category: 'advertising', duration: 'Session', description: 'LinkedIn language setting' },
+    
+    // Pinterest Advertising
     '_pinterest_ct_ua': { category: 'advertising', duration: '365 days', description: 'Pinterest Click Tracking' },
     '_pinterest_sess': { category: 'advertising', duration: '1 day', description: 'Pinterest session' },
     'cm_sub': { category: 'advertising', duration: '365 days', description: 'Pinterest conversion' },
-    'obuid': { category: 'advertising', duration: '365 days', description: 'Outbrain user ID' },
-    'obcl': { category: 'advertising', duration: '30 days', description: 'Outbrain click tracking' },
+    '_pin_unauth': { category: 'advertising', duration: '1 year', description: 'Pinterest unauthenticated user' },
+    '_auth': { category: 'advertising', duration: '1 year', description: 'Pinterest authentication' },
+    '_pinterest_referrer': { category: 'advertising', duration: '1 day', description: 'Pinterest referral source' },
+    
+    // Twitter Advertising
     'personalization_id': { category: 'advertising', duration: '730 days', description: 'Twitter personalization' },
     'guest_id': { category: 'advertising', duration: '730 days', description: 'Twitter guest tracking' },
+    'ct0': { category: 'advertising', duration: '6 hours', description: 'Twitter CSRF token' },
+    'auth_token': { category: 'advertising', duration: 'Session', description: 'Twitter authentication' },
+    'twid': { category: 'advertising', duration: '730 days', description: 'Twitter user ID' },
+    
+    // Snapchat Advertising
     'sc_at': { category: 'advertising', duration: '365 days', description: 'Snapchat Ads tracking' },
     '_scid': { category: 'advertising', duration: '365 days', description: 'Snapchat user ID' },
-    'rdt_uuid': { category: 'advertising', duration: '365 days', description: 'Reddit unique user ID' },
-    'session_tracker': { category: 'advertising', duration: '1 day', description: 'Reddit session' },
-    'criteo': { category: 'advertising', duration: '365 days', description: 'Criteo retargeting' },
-    'uid': { category: 'advertising', duration: '365 days', description: 'Criteo user ID' },
-    '__adroll': { category: 'advertising', duration: '365 days', description: 'AdRoll tracking' },
-    '__ar_v4': { category: 'advertising', duration: '365 days', description: 'AdRoll segmentation' },
-    'ad-id': { category: 'advertising', duration: '270 days', description: 'Amazon Ad System ID' },
-    'ad-privacy': { category: 'advertising', duration: '730 days', description: 'Amazon Ad Preferences' },
+    '_sctr': { category: 'advertising', duration: '365 days', description: 'Snapchat click tracking' },
+    'snap_ga': { category: 'advertising', duration: '90 days', description: 'Snapchat Google Analytics' },
+    
+    // ========== ANALYTICS COOKIES ==========
+    // Google Analytics
+    '_ga': { category: 'analytics', duration: '730 days', description: 'Google Analytics client ID' },
+    '_gid': { category: 'analytics', duration: '1 day', description: 'Google Analytics user ID' },
+    '_gat': { category: 'analytics', duration: '1 minute', description: 'Google Analytics throttle' },
+    '_gat_UA-': { category: 'analytics', duration: '1 minute', description: 'Google Analytics account throttle' },
+    '_ga_': { category: 'analytics', duration: '730 days', description: 'Google Analytics persistent ID' },
+    '_dc_gtm_': { category: 'analytics', duration: '1 minute', description: 'Google Tag Manager' },
+    
+    // Microsoft Clarity
+    '_clck': { category: 'analytics', duration: '365 days', description: 'Microsoft Clarity user ID' },
+    '_clsk': { category: 'analytics', duration: '1 day', description: 'Microsoft Clarity session linkage' },
+    '_cltk': { category: 'analytics', duration: 'Session', description: 'Microsoft Clarity session tracking' },
+    'CLID': { category: 'analytics', duration: '365 days', description: 'Microsoft Clarity client ID' },
+    'ANONCHK': { category: 'analytics', duration: '1 day', description: 'Microsoft Clarity anonymous check' },
+    'SM': { category: 'analytics', duration: 'Session', description: 'Microsoft Clarity session marker' },
+    
+    // Adobe Analytics
+    's_cc': { category: 'analytics', duration: 'Session', description: 'Adobe Analytics settings' },
+    's_sq': { category: 'analytics', duration: 'Session', description: 'Adobe Analytics clickstream' },
+    'AMCV_': { category: 'analytics', duration: '730 days', description: 'Adobe Marketing Cloud ID' },
+    's_vi': { category: 'analytics', duration: '730 days', description: 'Adobe Omniture visitor ID' },
+    'demdex': { category: 'analytics', duration: '180 days', description: 'Adobe Audience Manager' },
+    
+    // Hotjar
+    '_hjClosedSurveyInvites': { category: 'analytics', duration: '365 days', description: 'Hotjar closed surveys' },
+    '_hjDonePolls': { category: 'analytics', duration: '365 days', description: 'Hotjar completed polls' },
+    '_hjMinimizedPolls': { category: 'analytics', duration: '365 days', description: 'Hotjar minimized polls' },
+    '_hjShownFeedbackMessage': { category: 'analytics', duration: '365 days', description: 'Hotjar feedback status' },
+    '_hjid': { category: 'analytics', duration: '365 days', description: 'Hotjar user ID' },
+    '_hjIncludedInPageviewSample': { category: 'analytics', duration: '30 minutes', description: 'Hotjar pageview tracking' },
+    
+    // HubSpot Analytics
+    'hubspotutk': { category: 'analytics', duration: '365 days', description: 'HubSpot visitor identity' },
+    '__hssc': { category: 'analytics', duration: '30 minutes', description: 'HubSpot session' },
+    '__hssrc': { category: 'analytics', duration: 'Session', description: 'HubSpot new session' },
+    '__hstc': { category: 'analytics', duration: '730 days', description: 'HubSpot campaign tracking' },
+    'hsfirstvisit': { category: 'analytics', duration: '730 days', description: 'HubSpot first visit' },
+    
+    // ========== FUNCTIONAL COOKIES ==========
+    'PHPSESSID': { category: 'functional', duration: 'Session', description: 'PHP session identifier' },
+    'cookie_consent': { category: 'functional', duration: '365 days', description: 'Cookie consent preferences' },
+    'wp-settings-': { category: 'functional', duration: '1 year', description: 'WordPress user settings' },
+    'wp-settings-time-': { category: 'functional', duration: '1 year', description: 'WordPress settings timestamp' },
+    'wordpress_test_cookie': { category: 'functional', duration: 'Session', description: 'WordPress test cookie' },
+    'wfvt_': { category: 'functional', duration: '30 minutes', description: 'Wordfence security cookie' },
+    
+    // Facebook Functional
+    'wd': { category: 'functional', duration: 'Session', description: 'Facebook window dimensions' },
+    'presence': { category: 'functional', duration: 'Session', description: 'Facebook chat status' },
+    'sb': { category: 'functional', duration: '2 years', description: 'Facebook browser identification' },
+    
+    // ========== ESSENTIAL COOKIES ==========
+    'AWSALB': { category: 'essential', duration: '7 days', description: 'AWS load balancer' },
+    'AWSALBCORS': { category: 'essential', duration: '7 days', description: 'AWS CORS load balancer' },
+    '__cfduid': { category: 'essential', duration: '30 days', description: 'Cloudflare security' },
+    '__cf_bm': { category: 'essential', duration: '30 minutes', description: 'Cloudflare bot management' },
+    'JSESSIONID': { category: 'essential', duration: 'Session', description: 'Java session ID' },
+    'ARRAffinity': { category: 'essential', duration: 'Session', description: 'Azure load balancer' },
+    
+    // ========== OTHER PLATFORMS ==========
+    // Shopify
+    '_shopify_y': { category: 'analytics', duration: '1 year', description: 'Shopify analytics' },
+    '_shopify_s': { category: 'analytics', duration: '30 minutes', description: 'Shopify session' },
+    '_shopify_sa_p': { category: 'advertising', duration: '30 minutes', description: 'Shopify affiliate' },
+    '_shopify_fs': { category: 'analytics', duration: '2 years', description: 'Shopify first visit' },
+    '_shopify_uniq': { category: 'analytics', duration: '1 day', description: 'Shopify unique visitor' },
+    
+    // Taboola
+    't_gid': { category: 'advertising', duration: '365 days', description: 'Taboola user ID' },
+    't_sessionid': { category: 'advertising', duration: 'Session', description: 'Taboola session' },
+    'taboola_usg': { category: 'advertising', duration: '30 days', description: 'Taboola user segments' },
+    
+    // Outbrain
+    'obuid': { category: 'advertising', duration: '365 days', description: 'Outbrain user ID' },
+    'obcl': { category: 'advertising', duration: '30 days', description: 'Outbrain click tracking' },
+    'outbrain_cid': { category: 'advertising', duration: '30 days', description: 'Outbrain click ID' },
+    
+    // Verizon Media
+    'TUUID': { category: 'advertising', duration: '365 days', description: 'Verizon user ID' },
+    'TUUID_TIMESTAMP': { category: 'advertising', duration: '365 days', description: 'Verizon timestamp' },
+    
+    // Quantcast
+    'd': { category: 'advertising', duration: '3 months', description: 'Quantcast measurement' },
+    'qc_shared': { category: 'advertising', duration: '3 months', description: 'Quantcast shared data' },
+    
+    // Liveramp
+    '_cc_cc': { category: 'advertising', duration: '180 days', description: 'LiveRamp identity' },
+    '_cc_id': { category: 'advertising', duration: '180 days', description: 'LiveRamp cookie ID' },
+    
+    // Yandex
     'yandexuid': { category: 'advertising', duration: '365 days', description: 'Yandex Metrica user ID' },
     'ymex': { category: 'advertising', duration: '365 days', description: 'Yandex Metrica visitor' },
+    '_ym_uid': { category: 'analytics', duration: '365 days', description: 'Yandex Metrica unique ID' },
+    '_ym_d': { category: 'analytics', duration: '365 days', description: 'Yandex Metrica first visit' },
+    
+    // Quora
     'm-b': { category: 'advertising', duration: '365 days', description: 'Quora browser ID' },
     'm-uid': { category: 'advertising', duration: '365 days', description: 'Quora user ID' },
+    
+    // StackAdapt
     'sadb': { category: 'advertising', duration: '30 days', description: 'StackAdapt bidding data' },
     'sadr': { category: 'advertising', duration: '30 days', description: 'StackAdapt retargeting' },
+    
+    // The Trade Desk
     'TDID': { category: 'advertising', duration: '365 days', description: 'The Trade Desk ID' },
     'TDCPM': { category: 'advertising', duration: '365 days', description: 'The Trade Desk CPM data' },
+    
+    // MediaMath
     'mmapi': { category: 'advertising', duration: '30 days', description: 'MediaMath API tracking' },
     'mmdata': { category: 'advertising', duration: '30 days', description: 'MediaMath campaign data' },
-    '_ga': { category: 'analytics', duration: '730 days', description: 'Google Analytics' },
-    '_gid': { category: 'analytics', duration: '1 day', description: 'Google Analytics' },
-    '_gat': { category: 'analytics', duration: '1 minute', description: 'Google Analytics throttle' },
-    'PHPSESSID': { category: 'functional', duration: 'Session', description: 'PHP session' },
-    'cookie_consent': { category: 'functional', duration: '365 days', description: 'Consent preferences' },
-
-    // New Facebook cookies from your list
-    'lu': { category: 'advertising', duration: '2 years', description: 'Used to record whether the person chose to remain logged in (User ID and miscellaneous log in information)' },
-    'xs': { category: 'advertising', duration: '90 days', description: 'Used with c_user cookie to authenticate identity to Facebook (Session ID, creation time, authentication value)' },
-    'c_user': { category: 'advertising', duration: '90 days', description: 'Used with xs cookie to authenticate identity to Facebook (User ID)' },
-    'm_user': { category: 'advertising', duration: '90 days', description: 'Used to authenticate identity on Facebook mobile website (Email, User ID, authentication value)' },
-    'pl': { category: 'advertising', duration: '90 days', description: 'Records that a device or browser logged in via Facebook platform' },
-    'dbln': { category: 'advertising', duration: '2 years', description: 'Used to enable device-based logins (Login authentication values)' },
-    'aks': { category: 'advertising', duration: '30 days', description: 'Determines login state of a person visiting accountkit.com (Account kit access token)' },
-    'aksb': { category: 'advertising', duration: '30 minutes', description: 'Authenticates logins using Account Kit (Request time value)' },
-    'sfau': { category: 'advertising', duration: '1 day', description: 'Optimizes recovery flow after failed login attempts (Encrypted user ID, contact point, time stamp)' },
-    'ick': { category: 'advertising', duration: '2 years', description: 'Stores an encryption key used to encrypt cookies' },
-    'csm': { category: 'advertising', duration: '90 days', description: 'Insecure indicator' },
-    's': { category: 'advertising', duration: '90 days', description: 'Facebook browser identification, authentication, marketing cookies' },
-    'sb': { category: 'advertising', duration: '2 years', description: 'Facebook browser identification, authentication, marketing cookies' },
-    '_fbc': { category: 'advertising', duration: '2 years', description: 'Used for Facebook advertising products like real time bidding' },
-    'oo': { category: 'advertising', duration: '5 years', description: 'Ad opt-out cookie' },
-    'ddid': { category: 'advertising', duration: '28 days', description: 'Used to open specific location in advertiser app upon installation' },
-    'locale': { category: 'advertising', duration: '7 days', description: 'Contains display locale of last logged in user' },
-    'js_ver': { category: 'advertising', duration: '7 days', description: 'Records age of Facebook javascript files' },
-    'rc': { category: 'advertising', duration: '7 days', description: 'Used to optimize site performance for advertisers' },
-    'campaign_click_url': { category: 'advertising', duration: '30 days', description: 'Records Facebook URL landed on after clicking an ad' },
-    'usida': { category: 'advertising', duration: 'Session', description: 'Collects browser and unique identifier for targeted advertising' },
     
-    // Facebook functional cookies
-    'wd': { category: 'functional', duration: 'Session', description: 'Stores browser window dimensions for page rendering optimization' },
-    'presence': { category: 'functional', duration: 'Session', description: 'Contains user chat state' }
+    // Criteo
+    'criteo': { category: 'advertising', duration: '365 days', description: 'Criteo retargeting' },
+    'uid': { category: 'advertising', duration: '365 days', description: 'Criteo user ID' },
+    
+    // AdRoll
+    '__adroll': { category: 'advertising', duration: '365 days', description: 'AdRoll tracking' },
+    '__ar_v4': { category: 'advertising', duration: '365 days', description: 'AdRoll segmentation' },
+    
+    // Amazon Advertising
+    'ad-id': { category: 'advertising', duration: '270 days', description: 'Amazon Ad System ID' },
+    'ad-privacy': { category: 'advertising', duration: '730 days', description: 'Amazon Ad Preferences' },
+    'adblk': { category: 'advertising', duration: '30 days', description: 'Amazon Ad Block detection' },
+    
+    // New Relic
+    'NRBA_POOL': { category: 'analytics', duration: 'Session', description: 'New Relic browser monitoring' },
+    'NRBA_SESSION': { category: 'analytics', duration: 'Session', description: 'New Relic session tracking' },
+    
+    // Optimizely
+    'optimizelyEndUserId': { category: 'analytics', duration: '180 days', description: 'Optimizely user ID' },
+    'optimizelySegments': { category: 'analytics', duration: '180 days', description: 'Optimizely segmentation' },
+    
+    // Vimeo
+    'vuid': { category: 'analytics', duration: '2 years', description: 'Vimeo analytics ID' },
+    'player': { category: 'functional', duration: '1 year', description: 'Vimeo player preferences' },
+    
+    // YouTube
+    'VISITOR_INFO1_LIVE': { category: 'functional', duration: '180 days', description: 'YouTube bandwidth estimation' },
+    'YSC': { category: 'functional', duration: 'Session', description: 'YouTube session cookie' },
+    'PREF': { category: 'functional', duration: '2 years', description: 'YouTube preferences' },
+    
+    // Dailymotion
+    'dmvk': { category: 'analytics', duration: 'Session', description: 'Dailymotion visitor key' },
+    'dm_last_visit': { category: 'analytics', duration: '1 year', description: 'Dailymotion last visit' },
+    
+    // Trustpilot
+    'trustpilot_customer_auth': { category: 'functional', duration: 'Session', description: 'Trustpilot authentication' },
+    'trustpilot_machine_id': { category: 'analytics', duration: '1 year', description: 'Trustpilot device ID' },
+    
+    // Zendesk
+    '__zlcmid': { category: 'functional', duration: '1 year', description: 'Zendesk chat identification' },
+    '__zlcprivacy': { category: 'functional', duration: '1 year', description: 'Zendesk privacy preferences' },
+    
+    // Freshchat
+    '_fw_crm_v': { category: 'functional', duration: '1 year', description: 'Freshchat visitor ID' },
+    '_fw_l2_b': { category: 'functional', duration: 'Session', description: 'Freshchat session' },
+    
+    // Drift
+    'drift_aid': { category: 'functional', duration: '2 years', description: 'Drift anonymous ID' },
+    'drift_campaign_refresh': { category: 'functional', duration: 'Session', description: 'Drift campaign state' },
+    
+    // Intercom
+    'intercom-id': { category: 'functional', duration: '9 months', description: 'Intercom user ID' },
+    'intercom-session': { category: 'functional', duration: '7 days', description: 'Intercom session' },
+    
+    // Segment
+    'ajs_anonymous_id': { category: 'analytics', duration: '1 year', description: 'Segment anonymous ID' },
+    'ajs_user_id': { category: 'analytics', duration: '1 year', description: 'Segment user ID' },
+    
+    // Snowplow
+    '_sp_id': { category: 'analytics', duration: '2 years', description: 'Snowplow visitor ID' },
+    '_sp_ses': { category: 'analytics', duration: '30 minutes', description: 'Snowplow session ID' },
+    
+    // Matomo
+    '_pk_id': { category: 'analytics', duration: '1 year', description: 'Matomo visitor ID' },
+    '_pk_ses': { category: 'analytics', duration: '30 minutes', description: 'Matomo session ID' },
+    
+    // Crazy Egg
+    'is_returning': { category: 'analytics', duration: '5 years', description: 'Crazy Egg returning visitor' },
+    'ce_need_secure': { category: 'functional', duration: 'Session', description: 'Crazy Egg security' },
+    
+    // Mouseflow
+    'mf_[websiteid]': { category: 'analytics', duration: '90 days', description: 'Mouseflow session' },
+    'mf_user': { category: 'analytics', duration: '90 days', description: 'Mouseflow user ID' },
+    
+    // FullStory
+    '_fsuid': { category: 'analytics', duration: '1 year', description: 'FullStory user ID' },
+    '_fssid': { category: 'analytics', duration: 'Session', description: 'FullStory session ID' },
+    
+    // Pardot
+    'visitor_id': { category: 'advertising', duration: '10 years', description: 'Pardot visitor ID' },
+    'visitor_id-hash': { category: 'advertising', duration: '10 years', description: 'Pardot hashed visitor ID' },
+    
+    // Marketo
+    '_mkto_trk': { category: 'advertising', duration: '2 years', description: 'Marketo tracking' },
+    'BIGipServerpool_': { category: 'functional', duration: 'Session', description: 'Marketo load balancing' },
+    
+    // Eloqua
+    'ELOQUA': { category: 'advertising', duration: '2 years', description: 'Eloqua visitor ID' },
+    'ELQSTATUS': { category: 'advertising', duration: '2 years', description: 'Eloqua status' },
+    
+    // Salesforce
+    'sid': { category: 'essential', duration: 'Session', description: 'Salesforce session ID' },
+    'clientSrc': { category: 'functional', duration: '1 year', description: 'Salesforce client source' },
+    
+    // Tealium
+    'utag_main': { category: 'analytics', duration: '1 year', description: 'Tealium main cookie' },
+    'utag_env': { category: 'analytics', duration: 'Session', description: 'Tealium environment' },
+    
+    // OneTrust
+    'OptanonAlertBoxClosed': { category: 'functional', duration: '365 days', description: 'OneTrust consent banner closed' },
+    'OptanonConsent': { category: 'functional', duration: '365 days', description: 'OneTrust consent preferences' },
+    
+    // Cookiebot
+    'CookieConsent': { category: 'functional', duration: '1 year', description: 'Cookiebot consent status' },
+    'cookietest': { category: 'functional', duration: 'Session', description: 'Cookiebot test' },
+    
+    // Usercentrics
+    'uc_user_interaction': { category: 'functional', duration: '1 year', description: 'Usercentrics user consent' },
+    'uc_user_interaction_ts': { category: 'functional', duration: '1 year', description: 'Usercentrics consent timestamp' },
+    
+    // TrustArc
+    'notice_gdpr_prefs': { category: 'functional', duration: '1 year', description: 'TrustArc GDPR preferences' },
+    'notice_behavior': { category: 'functional', duration: '1 year', description: 'TrustArc notice behavior' },
+    
+    // Quantcast Choice
+    'quantcast_choice': { category: 'functional', duration: '1 year', description: 'Quantcast consent' },
+    'quantcast2.quantcast': { category: 'functional', duration: '1 year', description: 'Quantcast preferences' },
+    
+    // IAB TCF
+    'euconsent-v2': { category: 'functional', duration: '1 year', description: 'IAB TCF consent string' },
+    'eupubconsent-v2': { category: 'functional', duration: '1 year', description: 'IAB TCF publisher consent' }
 };
 
 // Language translations (keeping only en and fr as requested)
@@ -1434,16 +1664,21 @@ if (savedLocation) {
 }
 // Function to fetch location data
 async function fetchLocationData() {
-    // Skip if we already have valid location data (optional safety check)
+    // Skip if we already have valid location data
     if (locationData.country && locationData.country !== 'Unknown') {
         return locationData;
     }
 
     try {
+        console.log('Fetching location data from ipinfo.io...');
         const response = await fetch('https://ipinfo.io/json?token=4c1e5d00e0ac93');
-        if (!response.ok) throw new Error('Failed to fetch location');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
         const payload = await response.json();
+        console.log('Received location data:', payload);
         
         // Update locationData with actual values
         locationData = {
@@ -1452,22 +1687,17 @@ async function fetchLocationData() {
             city: payload.city || "Unknown",
             zip: payload.postal || "Unknown",
             ip: payload.ip || "Unknown",
-            street: payload.loc || "Unknown",
+            street: payload.loc || "Unknown", // This is actually lat/long coordinates
             region: payload.region || "Unknown",
             timezone: payload.timezone || "Unknown",
             isp: payload.org || "Unknown",
-            language: (navigator.language || "Unknown").split("-")[0]
+            language: (navigator.language || "en").split("-")[0]
         };
 
+        console.log('Processed location data:', locationData);
+        
         // Save to session storage
         sessionStorage.setItem('locationData', JSON.stringify(locationData));
-        
-        // Push to dataLayer - THIS IS WHERE IT HAPPENS NOW
-        window.dataLayer.push({
-            'event': 'locationRetrieved',
-            'location_data': locationData,
-            'timestamp': new Date().toISOString()
-        });
         
         return locationData;
         
@@ -1482,9 +1712,9 @@ async function fetchLocationData() {
             ip: "Unknown",
             street: "Unknown",
             region: "Unknown",
-            timezone: "Unknown",
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown",
             isp: "Unknown",
-            language: (navigator.language || "Unknown").split("-")[0]
+            language: (navigator.language || "en").split("-")[0]
         };
         return locationData;
     }
@@ -1982,6 +2212,105 @@ function getCookieDuration(name) {
     return "Session";
 }
 
+
+
+// Function to store query parameters in localStorage
+function storeQueryParams() {
+    if (!config.queryParamsConfig.enabled) return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const storedParams = JSON.parse(localStorage.getItem('storedQueryParams') || '{}');
+    const expiration = new Date();
+    expiration.setDate(expiration.getDate() + config.queryParamsConfig.retentionDays);
+
+    config.queryParamsConfig.paramsToStore.forEach(param => {
+        if (urlParams.has(param)) {
+            const value = sanitizeParamValue(urlParams.get(param));
+            if (value) {
+                storedParams[param] = {
+                    value: value,
+                    expires: expiration.getTime()
+                };
+            }
+        }
+    });
+
+    if (Object.keys(storedParams).length > 0) {
+        localStorage.setItem('storedQueryParams', JSON.stringify(storedParams));
+    }
+}
+
+function addStoredParamsToURL() {
+    if (!config.queryParamsConfig.enabled || !config.queryParamsConfig.autoRestore) return;
+
+    const storedData = localStorage.getItem('storedQueryParams');
+    if (!storedData) return;
+
+    const storedParams = JSON.parse(storedData);
+    const currentParams = new URLSearchParams(window.location.search);
+    const url = new URL(window.location.href);
+    const now = new Date().getTime();
+
+    let hasUpdates = false;
+
+    Object.entries(storedParams).forEach(([key, data]) => {
+        // Check if parameter has expired
+        if (data.expires && data.expires < now) {
+            delete storedParams[key];
+            hasUpdates = true;
+            return;
+        }
+
+        // Only add if not already in URL and value is valid
+        if (!currentParams.has(key) && data.value) {
+            url.searchParams.set(key, data.value);
+            hasUpdates = true;
+        }
+    });
+
+    if (hasUpdates) {
+        // Update localStorage if we removed expired params
+        if (Object.keys(storedParams).length > 0) {
+            localStorage.setItem('storedQueryParams', JSON.stringify(storedParams));
+        } else {
+            localStorage.removeItem('storedQueryParams');
+        }
+
+        // Only update URL if we actually added params
+        if (url.search !== window.location.search) {
+            window.history.replaceState(null, '', url.toString());
+        }
+    }
+}
+
+
+
+
+// Add this new function to manually clear stored parameters:
+function clearStoredParams() {
+    if (!config.queryParamsConfig.manualClear) return;
+    
+    localStorage.removeItem('storedQueryParams');
+    console.log('Stored query parameters cleared');
+    
+    // Optional: Add UI feedback if you want
+    if (typeof window.showAlert === 'function') {
+        window.showAlert('Stored URL parameters have been cleared');
+    }
+}
+
+// Add to your window.cookieConsent exports:
+if (typeof window !== 'undefined') {
+    window.cookieConsent = {
+        // ... existing exports ...
+        clearStoredParams: clearStoredParams,
+        getStoredParams: () => JSON.parse(localStorage.getItem('storedQueryParams') || '{}')
+    };
+}
+
+
+
+
 // Generate cookie table with mobile-friendly display
 function generateCookieTable(cookies) {
     return `
@@ -2030,7 +2359,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
                     <span class="toggle-slider"></span>
                 </label>
             </div>
-            <p>${lang[`${categoryKey}Desc`]}</p>
+             <p class="broadcookiedes">${lang[`${categoryKey}Desc`]}</p>
             <div class="cookie-details-container">
                 <div class="cookie-details-header">
                     <span>Cookie Details</span>
@@ -2168,6 +2497,13 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         overflow: hidden;
     }
 
+
+    /* .broadcookiedes {
+      font-size: 0px;
+    } */
+
+
+
     .cookie-consent-banner.show {
         transform: translateY(0);
         opacity: 1;
@@ -2234,7 +2570,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         background-color: ${config.buttonStyle.adjust.hover.background};
         color: ${config.buttonStyle.adjust.hover.color};
         transform: ${config.buttonStyle.adjust.hover.transform};
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        
     }
 
     .main-reject-btn {
@@ -2247,21 +2583,21 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         background-color: ${config.buttonStyle.reject.hover.background};
         color: ${config.buttonStyle.reject.hover.color};
         transform: ${config.buttonStyle.reject.hover.transform};
-        box-shadow: 0 2px 8px rgba(231, 76, 60, 0.15);
+        
     }
 
  .main-accept-button {
     background-color: ${config.buttonStyle.accept.background};
     color: ${config.buttonStyle.accept.color};
     border: ${config.buttonStyle.accept.border};
-    box-shadow: 0 2px 12px rgba(46, 204, 113, 0.3);
+    
 }
 
 .main-accept-button:hover {
     background-color: ${config.buttonStyle.accept.hover.background};
     color: ${config.buttonStyle.accept.hover.color};
     transform: ${config.buttonStyle.accept.hover.transform};
-    box-shadow: 0 4px 16px rgba(46, 204, 113, 0.4);
+    
 }
 
     .main-save-btn {
@@ -2575,6 +2911,7 @@ function injectConsentHTML(detectedCookies, language = 'en') {
         font-weight: 500;
         display: inline-block;
         transition: color 0.2s ease;
+        display: none;
     }
 
     .see-analytics-link:hover {
@@ -3198,9 +3535,15 @@ function initializeCookieConsent(detectedCookies, language) {
     const bannerShouldBeShown = geoAllowed && shouldShowBanner();
     
     if (!consentGiven && config.behavior.autoShow && bannerShouldBeShown) {
+        // Detect if mobile device
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // Use mobile delay if mobile, otherwise use desktop delay
+        const delay = isMobile ? config.behavior.bannerDelayMobile : config.behavior.bannerDelay;
+        
         setTimeout(() => {
             showCookieBanner();
-        }, config.behavior.bannerDelay * 1000);
+        }, delay * 1000);
     } else if (consentGiven) {
         const consentData = JSON.parse(consentGiven);
         updateConsentMode(consentData);
@@ -3487,6 +3830,9 @@ function acceptAllCookies() {
         timestamp: new Date().getTime()
     };
     
+    // Restore stored query parameters when accepting cookies
+    addStoredParamsToURL();
+    
     setCookie('cookie_consent', JSON.stringify(consentData), 365);
     updateConsentMode(consentData);
     loadCookiesAccordingToConsent(consentData);
@@ -3560,6 +3906,9 @@ function rejectAllCookies() {
 function saveCustomSettings() {
     const analyticsChecked = document.querySelector('input[data-category="analytics"]').checked;
     const advertisingChecked = document.querySelector('input[data-category="advertising"]').checked;
+    
+    // Restore stored query parameters when saving custom settings
+    addStoredParamsToURL();
     
     let gcsSignal;
     if (analyticsChecked && advertisingChecked) {
@@ -3776,7 +4125,13 @@ function getCookie(name) {
     }
     return null;
 }
-
+// Sanitize URL parameter values to prevent XSS and limit length
+function sanitizeParamValue(value) {
+    if (typeof value !== 'string') return '';
+    // Trim and limit length
+    return value.trim().substring(0, config.queryParamsConfig.maxLength)
+        .replace(/[<>"'`]/g, ''); // Basic XSS prevention
+}
 
 // Load analytics cookies function
 function loadAdvertisingCookies() {
@@ -3793,10 +4148,23 @@ function loadPerformanceCookies() {
 
 // Main execution flow
 document.addEventListener('DOMContentLoaded', async function() {
-      // Ensure location data is loaded first
-    if (!sessionStorage.getItem('locationData')) {
-        await fetchLocationData();
-    }  
+    // Ensure location data is loaded first
+    try {
+        if (!sessionStorage.getItem('locationData')) {
+            console.log('Fetching fresh location data...');
+            await fetchLocationData();
+        } else {
+            console.log('Using cached location data');
+            locationData = JSON.parse(sessionStorage.getItem('locationData'));
+        }
+        
+        console.log('Current location data:', locationData);
+    } catch (e) {
+        console.error('Failed to load location data:', e);
+    }
+    
+    // Store query parameters on page load
+    storeQueryParams();
    
 
  // Check if domain is allowed
@@ -3885,5 +4253,4 @@ if (typeof window !== 'undefined') {
         config: config
     };
 }
-
 
