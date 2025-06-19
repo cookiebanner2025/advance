@@ -1752,27 +1752,35 @@ async function fetchLocationData() {
 
 function pushGeoDataToDataLayer(geoData) {
     window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
+    const geoDataEvent = {
         'event': 'geoDataLoaded',
         'geo_data': {
-            'ip': geoData.ip,
-            'country': geoData.country,
-            'country_name': geoData.country_name,
-            'region': geoData.region,
-            'city': geoData.city,
-            'postal_code': geoData.postal,
+            'ip': geoData.ip || '',
+            'country': geoData.country || '',
+            'country_name': geoData.country_name || '',
+            'region': geoData.region || '',
+            'city': geoData.city || '',
+            'postal_code': geoData.postal || '',
             'coordinates': {
-                'latitude': geoData.latitude,
-                'longitude': geoData.longitude
+                'latitude': geoData.latitude || '',
+                'longitude': geoData.longitude || ''
             },
-            'timezone': geoData.timezone,
-            'organization': geoData.org,
-            'asn': geoData.asn,
-            'continent': geoData.continent,
-            'hostname': geoData.hostname
+            'timezone': geoData.timezone || '',
+            'organization': geoData.org || '',
+            'asn': geoData.asn || '',
+            'continent': geoData.continent || '',
+            'hostname': geoData.hostname || ''
         },
         'timestamp': new Date().toISOString()
-    });
+    };
+    
+    // Add location_data flat structure for backward compatibility
+    geoDataEvent.location_data = {
+        'country': geoData.country || '',
+        'city': geoData.city || ''
+    };
+    
+    window.dataLayer.push(geoDataEvent);
 }
 
 // Function to map countries to their respective continents
