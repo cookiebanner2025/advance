@@ -1775,7 +1775,6 @@ function pushGeoDataToDataLayer(geoData) {
     });
 }
 
-
 // Function to map countries to their respective continents
 function getContinentFromCountry(countryCode) {
     var continentMap = {
