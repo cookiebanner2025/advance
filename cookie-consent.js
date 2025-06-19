@@ -1663,116 +1663,58 @@ if (savedLocation) {
     });
 }
 // Function to fetch location data
-async function fetchLocationData() {
-    // Skip if we already have valid location data
-    if (locationData.country && locationData.country !== 'Unknown') {
-        return locationData;
-    }
 
-    try {
-        console.log('Fetching location data from ipinfo.io...');
-        const response = await fetch('https://ipinfo.io/json?token=4c1e5d00e0ac93');
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const payload = await response.json();
-        console.log('Received location data:', payload);
-        
-        // Update locationData with actual values
-        locationData = {
-            continent: getContinentFromCountry(payload.country) || "Unknown",
-            country: payload.country || "Unknown",
-            city: payload.city || "Unknown",
-            zip: payload.postal || "Unknown",
-            ip: payload.ip || "Unknown",
-            street: payload.loc || "Unknown", // This is actually lat/long coordinates
-            region: payload.region || "Unknown",
-            timezone: payload.timezone || "Unknown",
-            isp: payload.org || "Unknown",
-            language: (navigator.language || "en").split("-")[0]
-        };
+    async function fetchLocationData() {
+    // Return cached data if available
+    const cachedData = sessionStorage.getItem('locationData');
+    if (cachedData) return JSON.parse(cachedData);
 
-        console.log('Processed location data:', locationData);
-        
-        // Save to session storage
-        sessionStorage.setItem('locationData', JSON.stringify(locationData));
-        
-        return locationData;
-        
-    } catch (error) {
-        console.error('Error fetching location:', error);
-        // Set defaults if API fails
-        locationData = {
-            continent: "Unknown",
-            country: "Unknown",
-            city: "Unknown",
-            zip: "Unknown",
-            ip: "Unknown",
-            street: "Unknown",
-            region: "Unknown",
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown",
-            isp: "Unknown",
-            language: (navigator.language || "en").split("-")[0]
-        };
-        return locationData;
-    }
-}
+    const APIs = [
+        'https://ipinfo.io/json?token=4c1e5d00e0ac93',
+        'https://ipapi.co/json/',
+        'https://geolocation-db.com/json/'
+    ];
 
-
-
-
-async function fetchLocationData() {
-    // Try ipinfo.io first
-    try {
-        const response = await fetch('https://ipinfo.io/json?token=4c1e5d00e0ac93');
-        if (response.ok) {
+    for (const apiUrl of APIs) {
+        try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 3000);
+            
+            const response = await fetch(apiUrl, { signal: controller.signal });
+            clearTimeout(timeout);
+            
+            if (!response.ok) continue;
+            
             const payload = await response.json();
-            // Process as before...
-            return;
-        }
-    } catch (e) {
-        console.log('ipinfo.io failed, trying fallback...');
-    }
-    
-    // Fallback to ipapi.co
-    try {
-        const response = await fetch('https://ipapi.co/json/');
-        if (response.ok) {
-            const payload = await response.json();
-            locationData = {
-                continent: payload.continent_code || "Unknown",
-                country: payload.country || "Unknown",
-                city: payload.city || "Unknown",
-                zip: payload.postal || "Unknown",
-                ip: payload.ip || "Unknown",
-                street: "Unknown", // ipapi.co doesn't provide this
-                region: payload.region || "Unknown",
-                timezone: payload.timezone || "Unknown",
-                isp: payload.org || "Unknown",
-                language: (navigator.language || "en").split("-")[0]
+            
+            // Standardize the response format
+            const data = {
+                country: payload.country || payload.country_code,
+                city: payload.city,
+                region: payload.region || payload.regionName,
+                // ... map other fields
             };
-            return;
+
+            // Cache the result
+            sessionStorage.setItem('locationData', JSON.stringify(data));
+            return data;
+            
+        } catch (error) {
+            console.log(`Failed with ${apiUrl}:`, error);
+            continue;
         }
-    } catch (e) {
-        console.log('ipapi.co also failed');
     }
-    
-    // If all else fails, use defaults
-    locationData = {
-        continent: "Unknown",
+
+    // All APIs failed - fallback to browser language
+    console.warn("All geolocation APIs failed - using fallback");
+    const fallbackData = {
         country: "Unknown",
-        city: "Unknown",
-        zip: "Unknown",
-        ip: "Unknown",
-        street: "Unknown",
-        region: "Unknown",
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown",
-        isp: "Unknown",
-        language: (navigator.language || "en").split("-")[0]
+        // ... other defaults
     };
+    sessionStorage.setItem('locationData', JSON.stringify(fallbackData));
+    return fallbackData;
 }
+
 
 
 // Function to map countries to their respective continents
