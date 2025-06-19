@@ -1720,6 +1720,61 @@ async function fetchLocationData() {
     }
 }
 
+
+
+
+async function fetchLocationData() {
+    // Try ipinfo.io first
+    try {
+        const response = await fetch('https://ipinfo.io/json?token=4c1e5d00e0ac93');
+        if (response.ok) {
+            const payload = await response.json();
+            // Process as before...
+            return;
+        }
+    } catch (e) {
+        console.log('ipinfo.io failed, trying fallback...');
+    }
+    
+    // Fallback to ipapi.co
+    try {
+        const response = await fetch('https://ipapi.co/json/');
+        if (response.ok) {
+            const payload = await response.json();
+            locationData = {
+                continent: payload.continent_code || "Unknown",
+                country: payload.country || "Unknown",
+                city: payload.city || "Unknown",
+                zip: payload.postal || "Unknown",
+                ip: payload.ip || "Unknown",
+                street: "Unknown", // ipapi.co doesn't provide this
+                region: payload.region || "Unknown",
+                timezone: payload.timezone || "Unknown",
+                isp: payload.org || "Unknown",
+                language: (navigator.language || "en").split("-")[0]
+            };
+            return;
+        }
+    } catch (e) {
+        console.log('ipapi.co also failed');
+    }
+    
+    // If all else fails, use defaults
+    locationData = {
+        continent: "Unknown",
+        country: "Unknown",
+        city: "Unknown",
+        zip: "Unknown",
+        ip: "Unknown",
+        street: "Unknown",
+        region: "Unknown",
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown",
+        isp: "Unknown",
+        language: (navigator.language || "en").split("-")[0]
+    };
+}
+
+
 // Function to map countries to their respective continents
 function getContinentFromCountry(countryCode) {
     var continentMap = {
