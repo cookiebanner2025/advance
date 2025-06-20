@@ -59,53 +59,6 @@ const EU_COUNTRIES = [
   "VA", // Vatican City
 ];
 
-
-
- // IAB TCF v2.2 Configuration
-    iabTcf: {
-        enabled: true, // Set to true to enable IAB TCF support
-        cmpId: 123, // Your CMP ID (register at iabeurope.eu)
-        cmpVersion: 1, // Version of your CMP
-        gvlVersion: 48, // Global Vendor List version
-        policyVersion: 2, // TCF Policy version
-        consentLanguage: 'en', // Default language for consent strings
-        publisherCountryCode: 'US', // Your country code
-        purposeOneTreatment: false, // Whether purpose 1 has special treatment
-        // List of vendors you work with (example IDs - replace with your actual vendors)
-        vendorList: {
-            vendors: {
-                1: { name: "Google Advertising Products", purposes: [1, 2, 3, 4, 5, 7, 9] },
-                2: { name: "Facebook", purposes: [1, 2, 3, 4, 5, 7, 9] },
-                3: { name: "Microsoft Advertising", purposes: [1, 2, 3, 4, 5, 7, 9] }
-            },
-            purposes: {
-                1: "Store and/or access information on a device",
-                2: "Select basic ads",
-                3: "Create a personalised ads profile",
-                4: "Select personalised ads",
-                5: "Create a personalised content profile",
-                6: "Select personalised content",
-                7: "Measure ad performance",
-                8: "Measure content performance",
-                9: "Apply market research to generate audience insights",
-                10: "Develop and improve products"
-            },
-            specialPurposes: {
-                1: "Ensure security, prevent fraud, and debug",
-                2: "Technically deliver ads or content"
-            },
-            features: {
-                1: "Match and combine offline data sources",
-                2: "Link different devices",
-                3: "Receive and use automatically-sent device characteristics for identification"
-            },
-            specialFeatures: {
-                1: "Use precise geolocation data",
-                2: "Actively scan device characteristics for identification"
-            }
-        }
-    },
-
 const config = {
     // Domain restriction
     allowedDomains: [],
@@ -819,127 +772,6 @@ const cookieDatabase = {
     'euconsent-v2': { category: 'functional', duration: '1 year', description: 'IAB TCF consent string' },
     'eupubconsent-v2': { category: 'functional', duration: '1 year', description: 'IAB TCF publisher consent' }
 };
-
-
-// IAB TCF v2.2 Functions
-function initIabTcf() {
-    if (!config.iabTcf.enabled) return;
-
-    // Initialize __tcfapi function if it doesn't exist
-    window.__tcfapi = window.__tcfapi || function() {
-        (window.__tcfapi.q = window.__tcfapi.q || []).push(arguments);
-    };
-
-    // Create the stub if it doesn't exist
-    if (!window.__tcfapi) {
-        window.__tcfapi = function() {
-            var gdprApplies;
-            var args = arguments;
-            
-            if (!args.length) {
-                return;
-            } else if (args[0] === 'ping') {
-                var retr = {
-                    gdprApplies: gdprApplies,
-                    cmpLoaded: false,
-                    cmpStatus: 'stub',
-                    displayStatus: 'hidden',
-                    apiVersion: '2.0'
-                };
-                
-                if (args[2]) {
-                    args[2](retr);
-                }
-            } else {
-                if (args[2]) {
-                    args[2](null, false);
-                }
-            }
-        };
-        
-        window.__tcfapi('ping', null, function(pingReturn) {
-            gdprApplies = pingReturn.gdprApplies;
-        });
-    }
-}
-
-function generateIabTcfString(consentData) {
-    if (!config.iabTcf.enabled) return null;
-
-    // Core string components
-    const coreString = {
-        version: 2,
-        created: new Date(),
-        lastUpdated: new Date(),
-        cmpId: config.iabTcf.cmpId,
-        cmpVersion: config.iabTcf.cmpVersion,
-        consentScreen: 1,
-        consentLanguage: config.iabTcf.consentLanguage,
-        vendorListVersion: config.iabTcf.gvlVersion,
-        policyVersion: config.iabTcf.policyVersion,
-        isServiceSpecific: true,
-        useNonStandardStacks: false,
-        purposeOneTreatment: config.iabTcf.purposeOneTreatment,
-        publisherCountryCode: config.iabTcf.publisherCountryCode,
-        
-        // Purposes consent (example - adjust based on your configuration)
-        purposeConsents: {
-            1: consentData.categories.advertising, // Store/access info
-            2: consentData.categories.advertising, // Basic ads
-            3: consentData.categories.advertising, // Personalized ads profile
-            4: consentData.categories.advertising, // Personalized ads
-            5: consentData.categories.advertising, // Personalized content profile
-            6: false, // Personalized content (not used in this example)
-            7: consentData.categories.analytics, // Measure ad performance
-            8: false, // Measure content performance (not used)
-            9: consentData.categories.analytics, // Market research
-            10: consentData.categories.analytics // Improve products
-        },
-        
-        // Vendor consents (example - adjust based on your vendor list)
-        vendorConsents: {}
-    };
-
-    // Set vendor consents based on configuration
-    Object.keys(config.iabTcf.vendorList.vendors).forEach(vendorId => {
-        coreString.vendorConsents[vendorId] = consentData.categories.advertising;
-    });
-
-    // Convert to base64 string
-    try {
-        const jsonString = JSON.stringify(coreString);
-        return btoa(unescape(encodeURIComponent(jsonString)));
-    } catch (e) {
-        console.error('Error generating IAB TCF string:', e);
-        return null;
-    }
-}
-
-function updateIabTcfConsent(consentData) {
-    if (!config.iabTcf.enabled) return;
-
-    const tcfString = generateIabTcfString(consentData);
-    if (tcfString) {
-        // Set the euconsent cookie
-        setCookie('euconsent-v2', tcfString, 365);
-        
-        // Notify listeners of consent change
-        window.__tcfapi('updateConsent', 2, function(updated) {
-            if (!updated) {
-                console.warn('Failed to update IAB TCF consent');
-            }
-        });
-    }
-}
-
-function getIabTcfConsent() {
-    if (!config.iabTcf.enabled) return null;
-    return getCookie('euconsent-v2');
-}
-
-
-
-
 
 // Language translations (keeping only en and fr as requested)
 const translations = {
@@ -2576,52 +2408,34 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     const availableLanguages = getAvailableLanguages();
     
     // Generate cookie tables for each category
- function generateCategorySection(category) {
-    const cookies = detectedCookies[category];
-    const categoryKey = category === 'functional' ? 'essential' : category;
-    const isEssential = category === 'functional';
-    
-    // Add vendor list for advertising category
-    let vendorListHTML = '';
-    if (category === 'advertising' && config.iabTcf.enabled) {
-        vendorListHTML = `
-        <div class="vendor-list-container" style="margin-top: 15px;">
-            <h4 style="margin-bottom: 10px;">Vendors</h4>
-            <ul style="list-style-type: none; padding-left: 0; margin-top: 0;">
-                ${Object.entries(config.iabTcf.vendorList.vendors).map(([id, vendor]) => `
-                <li style="margin-bottom: 8px;">
-                    <input type="checkbox" id="vendor_${id}" ${isEssential ? 'checked disabled' : 'checked'}>
-                    <label for="vendor_${id}" style="margin-left: 5px;">${vendor.name}</label>
-                </li>
-                `).join('')}
-            </ul>
+    const generateCategorySection = (category) => {
+        const cookies = detectedCookies[category];
+        const categoryKey = category === 'functional' ? 'essential' : category;
+        const isEssential = category === 'functional';
+        
+        return `
+        <div class="cookie-category">
+            <div class="toggle-container">
+                <h3>${lang[categoryKey]}</h3>
+                <label class="main-toggle-switch" data-ms-consent="ad_storage">
+                    <input type="checkbox" data-category="${category}" ${isEssential ? 'checked disabled' : ''}>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+             <p class="broadcookiedes">${lang[`${categoryKey}Desc`]}</p>
+            <div class="cookie-details-container">
+                <div class="cookie-details-header">
+                    <span>Cookie Details</span>
+                    <span class="toggle-details">+</span>
+                </div>
+                <div class="main-cookie-details-content" style="display: none;">
+                    ${cookies.length > 0 ? 
+                        generateCookieTable(cookies) : 
+                        `<p class="no-cookies-message">No cookies in this category detected.</p>`}
+                </div>
+            </div>
         </div>`;
-    }
-    
-    return `
-    <div class="cookie-category">
-        <div class="toggle-container">
-            <h3>${lang[categoryKey]}</h3>
-            <label class="main-toggle-switch" data-ms-consent="ad_storage">
-                <input type="checkbox" data-category="${category}" ${isEssential ? 'checked disabled' : ''}>
-                <span class="toggle-slider"></span>
-            </label>
-        </div>
-        <p class="broadcookiedes">${lang[`${categoryKey}Desc`]}</p>
-        ${vendorListHTML}
-        <div class="cookie-details-container">
-            <div class="cookie-details-header">
-                <span>Cookie Details</span>
-                <span class="toggle-details">+</span>
-            </div>
-            <div class="main-cookie-details-content" style="display: none;">
-                ${cookies.length > 0 ? 
-                    generateCookieTable(cookies) : 
-                    `<p class="no-cookies-message">No cookies in this category detected.</p>`}
-            </div>
-        </div>
-    </div>`;
-}
+    };
     
     // Generate language selector dropdown if enabled
     const languageSelector = config.languageConfig.showLanguageSelector ? `
@@ -4068,7 +3882,7 @@ function hideFloatingButton() {
 function acceptAllCookies() {
     const consentData = {
         status: 'accepted',
-        gcs: 'G111',
+        gcs: 'G111', // Explicit GCS signal for all granted
         categories: {
             functional: true,
             analytics: true,
@@ -4086,9 +3900,6 @@ function acceptAllCookies() {
     updateConsentMode(consentData);
     loadCookiesAccordingToConsent(consentData);
     
-    // Update IAB TCF consent
-    updateIabTcfConsent(consentData);
-    
     if (config.analytics.enabled) {
         updateConsentStats('accepted');
     }
@@ -4105,8 +3916,7 @@ function acceptAllCookies() {
             'functionality_storage': 'granted',
             'security_storage': 'granted'
         },
-        'gcs': 'G111',
-        'iab_tcf': getIabTcfConsent(),
+        'gcs': 'G111', // Explicit GCS signal
         'consent_status': 'accepted',
         'consent_categories': consentData.categories,
         'timestamp': new Date().toISOString(),
@@ -4117,7 +3927,7 @@ function acceptAllCookies() {
 function rejectAllCookies() {
     const consentData = {
         status: 'rejected',
-        gcs: 'G100',
+        gcs: 'G100', // Explicit GCS signal for all denied
         categories: {
             functional: false,
             analytics: false,
@@ -4131,9 +3941,6 @@ function rejectAllCookies() {
     setCookie('cookie_consent', JSON.stringify(consentData), 365);
     updateConsentMode(consentData);
     clearNonEssentialCookies();
-    
-    // Update IAB TCF consent
-    updateIabTcfConsent(consentData);
     
     if (config.analytics.enabled) {
         updateConsentStats('rejected');
@@ -4151,14 +3958,14 @@ function rejectAllCookies() {
             'functionality_storage': 'denied',
             'security_storage': 'granted'
         },
-        'gcs': 'G100',
-        'iab_tcf': getIabTcfConsent(),
+        'gcs': 'G100', // Explicit GCS signal
         'consent_status': 'rejected',
         'consent_categories': consentData.categories,
         'timestamp': new Date().toISOString(),
         'location_data': locationData
     });
 }
+
 function saveCustomSettings() {
     const analyticsChecked = document.querySelector('input[data-category="analytics"]').checked;
     const advertisingChecked = document.querySelector('input[data-category="advertising"]').checked;
@@ -4168,13 +3975,13 @@ function saveCustomSettings() {
     
     let gcsSignal;
     if (analyticsChecked && advertisingChecked) {
-        gcsSignal = 'G111';
+        gcsSignal = 'G111'; // Both granted
     } else if (!analyticsChecked && !advertisingChecked) {
-        gcsSignal = 'G100';
+        gcsSignal = 'G100'; // Both denied
     } else if (analyticsChecked && !advertisingChecked) {
-        gcsSignal = 'G101';
+        gcsSignal = 'G101'; // Analytics granted, ads denied
     } else if (!analyticsChecked && advertisingChecked) {
-        gcsSignal = 'G110';
+        gcsSignal = 'G110'; // Ads granted, analytics denied
     }
 
     const consentData = {
@@ -4194,9 +4001,6 @@ function saveCustomSettings() {
     setCookie('cookie_consent', JSON.stringify(consentData), 365);
     updateConsentMode(consentData);
     loadCookiesAccordingToConsent(consentData);
-    
-    // Update IAB TCF consent
-    updateIabTcfConsent(consentData);
     
     if (!consentData.categories.analytics) clearCategoryCookies('analytics');
     if (!consentData.categories.performance) clearCategoryCookies('performance');
@@ -4225,8 +4029,7 @@ function saveCustomSettings() {
                 'analytics_storage': 'granted',
                 'ad_storage': 'denied'
             },
-            'gcs': 'G101',
-            'iab_tcf': getIabTcfConsent(),
+            'gcs': 'G101', // Explicit GCS signal
             'consent_status': 'custom',
             'consent_categories': consentData.categories,
             'timestamp': new Date().toISOString(),
@@ -4239,19 +4042,18 @@ function saveCustomSettings() {
                 'ad_storage': 'granted',
                 'analytics_storage': 'denied'
             },
-            'gcs': 'G110',
-            'iab_tcf': getIabTcfConsent(),
+            'gcs': 'G110', // Explicit GCS signal
             'consent_status': 'custom',
             'consent_categories': consentData.categories,
             'timestamp': new Date().toISOString(),
             'location_data': locationData
         });
     } else {
+        // For all other cases (both accepted or both rejected)
         window.dataLayer.push({
             'event': 'cookie_consent_custom',
             'consent_mode': consentStates,
-            'gcs': gcsSignal,
-            'iab_tcf': getIabTcfConsent(),
+            'gcs': gcsSignal, // Explicit GCS signal
             'consent_status': 'custom',
             'consent_categories': consentData.categories,
             'timestamp': new Date().toISOString(),
@@ -4310,25 +4112,26 @@ function updateConsentMode(consentData) {
     };
 
     // Determine GCS signal based on consent status and categories
-    let gcsSignal = 'G100';
+    let gcsSignal = 'G100'; // Default to all denied
     
     if (consentData.status === 'accepted') {
-        gcsSignal = 'G111';
+        gcsSignal = 'G111'; // All granted
     } else if (consentData.status === 'custom') {
         if (consentData.categories.analytics && !consentData.categories.advertising) {
-            gcsSignal = 'G101';
+            gcsSignal = 'G101'; // Analytics granted, ads denied
         } else if (consentData.categories.advertising && !consentData.categories.analytics) {
-            gcsSignal = 'G110';
+            gcsSignal = 'G110'; // Ads granted, analytics denied
         } else if (consentData.categories.analytics && consentData.categories.advertising) {
-            gcsSignal = 'G111';
+            gcsSignal = 'G111'; // Both granted (same as accept all)
         } else {
-            gcsSignal = 'G100';
+            gcsSignal = 'G100'; // Both denied (same as reject all)
         }
     }
 
     // Update Google consent with explicit GCS parameter
     gtag('consent', 'update', {
         ...consentStates,
+      
     });
     
     // Update Microsoft UET consent if enabled
@@ -4338,6 +4141,7 @@ function updateConsentMode(consentData) {
             'ad_storage': uetConsentState
         });
         
+        // Push UET consent event to dataLayer with the exact requested format
         window.dataLayer.push({
             'event': 'uet_consent_update',
             'uet_consent': {
@@ -4350,24 +4154,6 @@ function updateConsentMode(consentData) {
             'location_data': locationData
         });
     }
-    
-    // Update IAB TCF consent
-    if (config.iabTcf.enabled) {
-        updateIabTcfConsent(consentData);
-    }
-    
-    // Push general consent update to dataLayer with GCS signal
-    window.dataLayer.push({
-        'event': 'cookie_consent_update',
-        'consent_mode': consentStates,
-        'gcs': gcsSignal,
-        'iab_tcf': getIabTcfConsent(),
-        'consent_status': consentData.status,
-        'consent_categories': consentData.categories,
-        'timestamp': new Date().toISOString(),
-        'location_data': locationData
-    });
-}
     
     // Push general consent update to dataLayer with GCS signal
     window.dataLayer.push({
@@ -4425,17 +4211,15 @@ function loadPerformanceCookies() {
 
 // Main execution flow
 document.addEventListener('DOMContentLoaded', async function() {
-    // Initialize IAB TCF API
-    initIabTcf();
-
     // Ensure location data is loaded first
     try {
         if (!sessionStorage.getItem('locationData')) {
             console.log('Fetching fresh location data...');
-            locationData = await fetchLocationData();
+            locationData = await fetchLocationData(); // This will now push to dataLayer
         } else {
             console.log('Using cached location data');
             locationData = JSON.parse(sessionStorage.getItem('locationData'));
+            // Push cached data to dataLayer
             pushGeoDataToDataLayer(locationData);
         }
         
@@ -4443,11 +4227,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     } catch (e) {
         console.error('Failed to load location data:', e);
     }
-
     // Store query parameters on page load
     storeQueryParams();
+   
 
-    // Check if domain is allowed
+ // Check if domain is allowed
     if (!isDomainAllowed()) {
         console.log('Cookie consent banner not shown - domain not allowed');
         return;
@@ -4461,14 +4245,17 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Set default UET consent
     setDefaultUetConsent();
 
-    // Check geo-targeting before proceeding
+    // Fetch location data asynchronously
+    await fetchLocationData();
+    
+      // Check geo-targeting before proceeding
     const geoAllowed = checkGeoTargeting(locationData);
     if (!geoAllowed) {
         console.log('Cookie consent banner not shown - geo-targeting restriction');
         return;
     }
 
-   // Scan and categorize existing cookies
+    // Scan and categorize existing cookies
     const detectedCookies = scanAndCategorizeCookies();
 
     // Detect user language
@@ -4530,4 +4317,3 @@ if (typeof window !== 'undefined') {
         config: config
     };
 }
-
