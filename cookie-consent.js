@@ -141,7 +141,7 @@ const config = {
 
 
 
- iabTcf: {
+  iabTcf: {
     enabled: true,
     version: 2,
     cmpId: 123, // Your CMP ID (register at iabeurope.eu)
@@ -163,7 +163,6 @@ const config = {
       vendors: Array(Object.keys(vendors).length).fill(false)
     }
   },
-  
 
 
 
@@ -2161,7 +2160,6 @@ function generateIabTcfUI(language = 'en') {
 
 
 
-
 // Generate password prompt HTML
 function generatePasswordPrompt(language = 'en') {
     const lang = translations[language] || translations.en;
@@ -2286,6 +2284,7 @@ function getAvailableLanguages() {
 
 
 // Generate TC string
+// Generate TC string
 function generateTCString(consentData) {
   if (!config.iabTcf.enabled) return "";
   
@@ -2346,6 +2345,7 @@ function isPurposeAllowed(purposeId, tcData) {
 }
 
 // Initialize IAB TCF API
+// Initialize IAB TCF API
 function initIabTcfApi() {
   if (!config.iabTcf.enabled || window.__tcfapi) return;
   
@@ -2377,7 +2377,6 @@ function initIabTcfApi() {
     }
   };
 }
-
 
 
 
@@ -4141,7 +4140,6 @@ async function fetchGlobalVendorList() {
     return null;
   }
 }
-
 // Call this during initialization
 async function initializeWithGVL() {
   const gvl = await fetchGlobalVendorList();
