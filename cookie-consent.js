@@ -2160,6 +2160,13 @@ function generateIabTcfUI(language = 'en') {
 
 
 
+
+
+
+
+
+
+
 // Generate password prompt HTML
 function generatePasswordPrompt(language = 'en') {
     const lang = translations[language] || translations.en;
@@ -2284,7 +2291,6 @@ function getAvailableLanguages() {
 
 
 // Generate TC string
-// Generate TC string
 function generateTCString(consentData) {
   if (!config.iabTcf.enabled) return "";
   
@@ -2345,7 +2351,6 @@ function isPurposeAllowed(purposeId, tcData) {
 }
 
 // Initialize IAB TCF API
-// Initialize IAB TCF API
 function initIabTcfApi() {
   if (!config.iabTcf.enabled || window.__tcfapi) return;
   
@@ -2377,7 +2382,6 @@ function initIabTcfApi() {
     }
   };
 }
-
 
 
 
@@ -3434,6 +3438,21 @@ function injectConsentHTML(detectedCookies, language = 'en') {
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .iab-tcf-section {
   margin: 30px 0;
   padding: 20px;
@@ -3465,6 +3484,22 @@ function injectConsentHTML(detectedCookies, language = 'en') {
 .vendor-policy-link:hover {
   text-decoration: underline;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     .close-analytics-modal {
         font-size: 28px;
         font-weight: bold;
@@ -4125,7 +4160,6 @@ function setupEventListeners() {
         }
     });
 }
-
 
 
 
